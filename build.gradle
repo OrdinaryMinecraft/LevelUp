@@ -14,43 +14,50 @@ buildscript {
         classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
     }
 }
+
 apply plugin: 'forge'
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
-archivesBaseName = "LevelUp!"
-version = "0.10"
-group = "com.github.levelup"
+
+version = "1.3.3"
+group= "ru.flametaichou.levelup" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "LevelUp (Ordinary Edition)"
+
 minecraft {
-    version = "1.7.10-10.13.2.1286"
+    version = "1.7.10-10.13.4.1614-1.7.10"
     runDir = "eclipse"
-    replace '${version}', project.version
 }
-sourceSets.main.java{srcDirs project.projectDir.getPath() include('assets/**')}
-sourceSets.main.resources{srcDirs project.projectDir.getPath() include('assets/**', 'mcmod.info', '*.mcmeta', '*META-INF/**')}
-processResources {
+
+dependencies {
+    // you may put jars on which you depend on in ./libs
+    // or you may define them like so..
+    //compile "some.group:artifact:version:classifier"
+    //compile "some.group:artifact:version"
+      
+    // real examples
+    //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
+    //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
+
+    // for more info...
+    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
+    // http://www.gradle.org/docs/current/userguide/dependency_management.html
+
+}
+
+processResources
+{
     // this will ensure that this task is redone when the versions change.
     inputs.property "version", project.version
     inputs.property "mcversion", project.minecraft.version
+
     // replace stuff in mcmod.info, nothing else
-    from(project.sourceSets.main.resources.srcDirs) {
+    from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
+                
         // replace version and mcversion
-        expand([version:project.version, mcversion:project.minecraft.version])
+        expand 'version':project.version, 'mcversion':project.minecraft.version
     }
-    // copy everything else, thats not mcmod.info
-    from(project.sourceSets.main.resources.srcDirs) {
-	include('*.png', '*.lang', '*.mcmeta', '*.cfg')
-    }
-}
-jar {
-    //Keep the jar as clean as possible
-    includeEmptyDirs = false
-    exclude('*.java')
-    //Append with minecraft version
-    classifier = "("+minecraft.version+")"
-    archiveName = archivesBaseName + "-" + version + classifier+"."+extension
-    // Add Coremod Manifest
-    manifest {
-        attributes 'FMLAT': "levelup_at.cfg"
+        
+    // copy everything else, thats not the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
     }
 }
