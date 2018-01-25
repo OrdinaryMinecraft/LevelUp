@@ -50,7 +50,7 @@ public class MobEventHandler {
                 }
 	        }
 			//double drop
-	        if (event.entity instanceof EntityMob && bonus / 5 > 0)
+	        if (event.entity instanceof EntityMob && !event.entity.getClass().getName().contains("custom") && bonus / 5 > 0)
 	        {
                 double d = Math.random() * 100; 
                 if (d < bonus / 5 * 5) {
