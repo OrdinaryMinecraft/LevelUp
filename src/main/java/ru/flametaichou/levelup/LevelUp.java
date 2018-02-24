@@ -79,8 +79,10 @@ public final class LevelUp {
         FMLEventHandler.INSTANCE.addCropsToBlackList(blackList);
         List<String> itemList = Arrays.asList(config.getStringList("Item for loot", "ItemList", new String[]{"265","266","339","263","371","337","318","318","357"}, "Additional items dropping from mobs and looted from chests."));
         List<String> itemRareList = Arrays.asList(config.getStringList("Item for loot (rare)", "itemRareList", new String[]{"264","388","354","372","384"}, "Rare items dropping from mobs and looted from chests."));
+        List<String> itemFishingList = Arrays.asList(config.getStringList("Item for fishing (rare)", "itemFishingList", new String[]{"264","388","372","384"}, "Rare items for fishing loot."));
         debugMode = config.getBoolean("Enable Debug Mode", "Cheats", false, "Enable debug messages in chat");
         MobEventHandler.addItemsToList(itemList, itemRareList);
+        PlayerEventHandler.addItemsToFishingList(itemFishingList);
         if (config.hasChanged())
             config.save();
         if (talismanEnabled) {

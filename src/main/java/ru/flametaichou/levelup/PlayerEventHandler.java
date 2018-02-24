@@ -7,12 +7,10 @@ import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityFishHook;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -24,14 +22,12 @@ import net.minecraft.item.ItemSpade;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.MathHelper;
+import net.minecraftforge.common.FishingHooks;
 import net.minecraftforge.common.IExtendedEntityProperties;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
@@ -66,8 +62,7 @@ public final class PlayerEventHandler {
     /**
      * Random additional loot for Fishing
      */
-    private static ItemStack[] lootList = new ItemStack[]{new ItemStack(Items.bone), new ItemStack(Items.reeds), new ItemStack(Items.arrow), new ItemStack(Items.apple),
-            new ItemStack(Items.bucket), new ItemStack(Items.boat), new ItemStack(Items.ender_pearl), new ItemStack(Items.fishing_rod), new ItemStack(Items.chainmail_chestplate), new ItemStack(Items.iron_ingot)};
+    private static List<String> bonusFishingLootList;
     /**
      * Internal ore counter
      */
@@ -147,46 +142,61 @@ public final class PlayerEventHandler {
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onInteract(PlayerInteractEvent event) {
         if (event.useItem != Event.Result.DENY)
+            /*
+            *
+            * Fishing skill
+            *
+            */
             if (event.action == Action.RIGHT_CLICK_AIR) {
                 EntityFishHook hook = event.entityPlayer.fishEntity;
-                //if (hook != null && hook.field_146043_c == null && hook.field_146045_ax > 0)
-                if (hook != null && hook.field_146043_c == null) {//Not attached to some random stuff, and within the time frame for catching
-                    int loot = getFishingLoot(event.entityPlayer);
-                    if (loot >= 0) {
-                        ItemStack stack = event.entityPlayer.inventory.getCurrentItem();
-                        int i = stack.stackSize;
-                        int j = stack.getItemDamage();
-                        stack.damageItem(loot, event.entityPlayer);
-                        event.entityPlayer.swingItem();
-                        event.entityPlayer.inventory.setInventorySlotContents(event.entityPlayer.inventory.currentItem, stack);
-                        if (event.entityPlayer.capabilities.isCreativeMode) {
-                            stack.stackSize = i;
-                            if (stack.isItemStackDamageable()) {
-                                stack.setItemDamage(j);
-                            }
-                        }
-                        if (stack.stackSize <= 0) {
-                            event.entityPlayer.inventory.setInventorySlotContents(event.entityPlayer.inventory.currentItem, null);
-                            MinecraftForge.EVENT_BUS.post(new PlayerDestroyItemEvent(event.entityPlayer, stack));
-                        }
-                        if (!event.entityPlayer.isUsingItem() && event.entityPlayer instanceof EntityPlayerMP) {
-                            ((EntityPlayerMP) event.entityPlayer).sendContainerToPlayer(event.entityPlayer.inventoryContainer);
-                        }
-                        event.useItem = Event.Result.DENY;
-                        if (!hook.worldObj.isRemote) {
-                            EntityItem entityitem = new EntityItem(hook.worldObj, hook.posX, hook.posY, hook.posZ, lootList[loot]);
-                            double d5 = hook.field_146042_b.posX - hook.posX;
-                            double d6 = hook.field_146042_b.posY - hook.posY;
-                            double d7 = hook.field_146042_b.posZ - hook.posZ;
-                            double d8 = MathHelper.sqrt_double(d5 * d5 + d6 * d6 + d7 * d7);
+                //Происходит при вытаскивании удочки
+                if (hook != null && hook.field_146043_c == null) {
+                    int loot = getBonusFishingLoot(event.entityPlayer);
+                    Random random = new Random();
+                    if (!hook.worldObj.isRemote) {
+                        //Проверяем "победу". Гениально!
+                        if (hook.isSneaking()) {
+                            EntityItem entityitem = new EntityItem(hook.worldObj, hook.posX, hook.posY, hook.posZ, FishingHooks.getRandomFishable(random,1));
+                            double d1 = hook.field_146042_b.posX - hook.posX;
+                            double d3 = hook.field_146042_b.posY - hook.posY;
+                            double d5 = hook.field_146042_b.posZ - hook.posZ;
+                            double d7 = (double) MathHelper.sqrt_double(d1 * d1 + d3 * d3 + d5 * d5);
                             double d9 = 0.1D;
-                            entityitem.motionX = d5 * d9;
-                            entityitem.motionY = d6 * d9 + MathHelper.sqrt_double(d8) * 0.08D;
-                            entityitem.motionZ = d7 * d9;
+                            entityitem.motionX = d1 * d9;
+                            entityitem.motionY = d3 * d9 + (double) MathHelper.sqrt_double(d7) * 0.08D;
+                            entityitem.motionZ = d5 * d9;
                             hook.worldObj.spawnEntityInWorld(entityitem);
-                            hook.field_146042_b.worldObj.spawnEntityInWorld(new EntityXPOrb(hook.field_146042_b.worldObj, hook.field_146042_b.posX, hook.field_146042_b.posY + 0.5D, hook.field_146042_b.posZ + 0.5D, event.entityPlayer.getRNG().nextInt(6) + 1));
+
+                            EntityItem bonusLoot = null;
+                            if (loot >=0)
+                                bonusLoot = new EntityItem(hook.worldObj, hook.posX, hook.posY, hook.posZ, new ItemStack (Item.getItemById(Integer.parseInt(bonusFishingLootList.get(loot)))));
+                            if (bonusLoot != null) {
+                                bonusLoot.motionX = d1 * d9;
+                                bonusLoot.motionY = d3 * d9 + (double) MathHelper.sqrt_double(d7) * 0.08D;
+                                bonusLoot.motionZ = d5 * d9;
+                                hook.worldObj.spawnEntityInWorld(bonusLoot);
+                                event.entityPlayer.addChatComponentMessage(new ChatComponentTranslation("rare.fish"));
+                            }
+                            hook.field_146042_b.worldObj.spawnEntityInWorld(new EntityXPOrb(hook.field_146042_b.worldObj, hook.field_146042_b.posX, hook.field_146042_b.posY + 0.5D, hook.field_146042_b.posZ + 0.5D, random.nextInt(6) + 1));
                         }
                     }
+
+                    //Тут ломаем удочку
+                    ItemStack item = event.entityPlayer.getHeldItem();
+                    int damage = item.getItemDamage();
+                    //item.damageItem(1, event.entityPlayer);
+                    if (!event.entityPlayer.capabilities.isCreativeMode) {
+                        if (item.isItemStackDamageable())
+                            item.setItemDamage(damage+1);
+                    }
+//                    if (stack.stackSize <= 0) {
+//                        event.entityPlayer.inventory.setInventorySlotContents(event.entityPlayer.inventory.currentItem, null);
+//                        MinecraftForge.EVENT_BUS.post(new PlayerDestroyItemEvent(event.entityPlayer, stack));
+//                    }
+//                    if (!event.entityPlayer.isUsingItem() && event.entityPlayer instanceof EntityPlayerMP) {
+//                         (EntityPlayerMP) event.entityPlayer).sendContainerToPlayer(event.entityPlayer.inventoryContainer);
+//                    }
+//                    event.useItem = Event.Result.DENY;
                 }
             } else if (event.action == Action.RIGHT_CLICK_BLOCK && noPlaceDuplicate && !event.world.isRemote) {
                 ItemStack itemStack = event.entityPlayer.inventory.getCurrentItem();
@@ -408,11 +418,11 @@ public final class PlayerEventHandler {
      *
      * @return -1 if no drop is required
      */
-    public static int getFishingLoot(EntityPlayer player) {
-        if (player.getRNG().nextDouble() > (getSkill(player, 10) / 5) * 0.05D) {
+    public static int getBonusFishingLoot(EntityPlayer player) {
+        if (player.getRNG().nextDouble() > (getSkill(player, 10) / 5) * 0.01D) {
             return -1;
         } else {
-            return player.getRNG().nextInt(lootList.length);
+            return player.getRNG().nextInt(bonusFishingLootList.size());
         }
     }
 
@@ -421,5 +431,14 @@ public final class PlayerEventHandler {
      */
     public static int getSkill(EntityPlayer player, int id) {
         return PlayerExtendedProperties.getSkillFromIndex(player, id);
+    }
+
+    /**
+     * Add items to fishing loot itemlist
+     */
+    public static void addItemsToFishingList(List<String> itemlist) {
+        if (bonusFishingLootList == null)
+            bonusFishingLootList = new ArrayList<String>(itemlist.size());
+        bonusFishingLootList = itemlist;
     }
 }

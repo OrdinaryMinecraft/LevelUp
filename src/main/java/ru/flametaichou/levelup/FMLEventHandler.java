@@ -13,14 +13,20 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.projectile.EntityFishHook;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemHoe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -115,6 +121,36 @@ public final class FMLEventHandler {
                     }
                 } else if (atinst.getModifier(sneakID) != null) {
                     atinst.removeModifier(mod);
+                }
+            }
+
+            //Fishing
+            int skillFishing = getSkill(player, 10);
+            if (skillFishing > 0)
+            if (event.player.fishEntity != null) {
+                EntityFishHook hook = event.player.fishEntity;
+                //Если поправок не в воде (до поклевки, находясь на поверхности воды
+                //считается что поплавок находится не в воде)
+                if (!hook.isInWater()) {
+                    if (hook.worldObj.getWorldTime() % 15 == 0) { //15 - время, за которое можно успеть схватить рыбу на крючке
+                        if (hook.motionY > 0) hook.setSneaking(false);
+                    }
+                    //Тут проверяется, летит ли еще поплавок в воду, или он уже остановился и занял позицию
+                    if (Math.abs(hook.motionX - hook.motionZ) <= 0.05) {
+                        Random random = new Random();
+                        if (!hook.worldObj.isRemote) {
+                            if (random.nextInt(2000) + 1 >= 2000-skillFishing) {
+                                hook.motionY -= 0.20000000298023224D;
+                                //Это победа
+                                hook.setSneaking(true);
+                                hook.playSound("random.splash", 0.25F, 1.0F + (random.nextFloat() - random.nextFloat()) * 0.4F);
+                                float f1 = (float) MathHelper.floor_double(hook.boundingBox.minY);
+                                WorldServer worldserver = (WorldServer) hook.worldObj;
+                                worldserver.func_147487_a("bubble", hook.posX, (double) (f1 + 1.0F), hook.posZ, (int) (1.0F + hook.width * 20.0F), (double) hook.width, 0.0D, (double) hook.width, 0.20000000298023224D);
+                                worldserver.func_147487_a("wake", hook.posX, (double) (f1 + 1.0F), hook.posZ, (int) (1.0F + hook.width * 20.0F), (double) hook.width, 0.0D, (double) hook.width, 0.20000000298023224D);
+                            }
+                        }
+                    }
                 }
             }
         }
