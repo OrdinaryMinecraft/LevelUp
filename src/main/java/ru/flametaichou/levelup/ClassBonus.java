@@ -6,7 +6,7 @@ public final class ClassBonus {
      */
     public final static String SKILL_ID = "LevelUpSkills";
     /**
-     * The sub keys used when registering each skill data
+     * The sub keyGui used when registering each skill data
      */
     public final static String[] skillNames = {"Mining", "Sword", "Defense", "WoodCutting", "Looting", "Archery", "Athletics", "Swimming", "Sneaking", "Farming", "Fishing", "Digging", "XP"};
     /**

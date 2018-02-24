@@ -5,6 +5,7 @@ import cpw.mods.fml.relauncher.Side;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.StatCollector;
+import ru.flametaichou.levelup.Handlers.SkillPacketHandler;
 
 public final class GuiSkills extends GuiScreen {
     private boolean closedWithButton;

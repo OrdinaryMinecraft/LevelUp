@@ -1,4 +1,4 @@
-package ru.flametaichou.levelup;
+package ru.flametaichou.levelup.Handlers;
 
 import com.google.common.collect.Sets;
 
@@ -34,7 +34,10 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
 import net.minecraftforge.event.entity.player.PlayerPickupXpEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.oredict.OreDictionary;
+import ru.flametaichou.levelup.ClassBonus;
 import ru.flametaichou.levelup.Items.ItemFishingLootBox;
+import ru.flametaichou.levelup.LevelUp;
+import ru.flametaichou.levelup.PlayerExtendedProperties;
 
 import java.util.*;
 
@@ -83,11 +86,10 @@ public final class PlayerEventHandler {
     /**
      * Items given by Digging ground
      */
-    private static ItemStack digLoot[] = {new ItemStack(Items.clay_ball, 8), new ItemStack(Items.bowl, 2), new ItemStack(Items.coal, 4), new ItemStack(Items.painting), new ItemStack(Items.stick, 4),
-            new ItemStack(Items.string, 2)};
-    private static ItemStack digLoot1[] = {new ItemStack(Items.stone_sword), new ItemStack(Items.stone_shovel), new ItemStack(Items.stone_pickaxe), new ItemStack(Items.stone_axe)};
-    private static ItemStack digLoot2[] = {new ItemStack(Items.slime_ball, 2), new ItemStack(Items.redstone, 8), new ItemStack(Items.iron_ingot), new ItemStack(Items.gold_ingot)};
-    private static ItemStack digLoot3[] = {new ItemStack(Items.diamond)};
+    private static ItemStack digLoot[] = {new ItemStack(Items.clay_ball), new ItemStack(Items.coal)};
+    private static ItemStack digLoot1[] = {new ItemStack(Items.gunpowder)};
+    private static ItemStack digLoot2[] = {new ItemStack(Items.slime_ball), new ItemStack(Items.redstone)};
+    private static ItemStack digLoot3[] = {new ItemStack(Items.glowstone_dust),new ItemStack(Items.gold_nugget)};
     /**
      * Internal ores list for Mining
      */
@@ -277,7 +279,7 @@ public final class PlayerEventHandler {
                     event.drops.add(new ItemStack(Items.stick, 2));
                 }
             } else if (event.block.getMaterial() == Material.ground) {
-                skill = getSkill(event.harvester, 11);
+                skill = getSkill(event.harvester, 0);
                 if (random.nextFloat() <= skill / 200F) {
                     ItemStack[] aitemstack4 = digLoot;
                     float f = random.nextFloat();
@@ -305,12 +307,6 @@ public final class PlayerEventHandler {
                         }
                     }
                     event.drops.add(toDrop);
-                }
-            } else if (event.block instanceof BlockGravel) {
-                skill = getSkill(event.harvester, 11);
-                if (random.nextInt(10) < skill / 5) {
-                    removeFromList(event.drops, event.block);
-                    event.drops.add(new ItemStack(Items.flint));
                 }
             }
         }

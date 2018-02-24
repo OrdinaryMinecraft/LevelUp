@@ -1,4 +1,4 @@
-package ru.flametaichou.levelup;
+package ru.flametaichou.levelup.Handlers;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent;
@@ -10,6 +10,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraftforge.common.config.Property;
+import ru.flametaichou.levelup.ClassBonus;
+import ru.flametaichou.levelup.LevelUp;
+import ru.flametaichou.levelup.PlayerExtendedProperties;
 
 public final class SkillPacketHandler {
     public static final String[] CHAN = {"LEVELUPINIT", "LEVELUPCLASSES", "LEVELUPSKILLS", "LEVELUPCFG"};

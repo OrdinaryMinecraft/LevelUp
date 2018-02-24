@@ -8,7 +8,9 @@ import net.minecraft.util.StatCollector;
 import net.minecraftforge.client.event.FOVUpdateEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
-import net.minecraft.client.settings.KeyBinding;
+import ru.flametaichou.levelup.Handlers.FMLEventHandler;
+import ru.flametaichou.levelup.Handlers.PlayerEventHandler;
+
 import java.awt.*;
 import java.util.List;
 

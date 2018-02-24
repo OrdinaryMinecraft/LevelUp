@@ -1,4 +1,4 @@
-package ru.flametaichou.levelup;
+package ru.flametaichou.levelup.Handlers;
 
 import java.util.Random;
 
@@ -6,7 +6,6 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.potion.Potion;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSourceIndirect;
@@ -14,6 +13,8 @@ import net.minecraft.util.MathHelper;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
+import ru.flametaichou.levelup.LevelUp;
+import ru.flametaichou.levelup.PlayerExtendedProperties;
 
 public final class FightEventHandler {
     public static final FightEventHandler INSTANCE = new FightEventHandler();
@@ -62,6 +63,7 @@ public final class FightEventHandler {
 	                    int j = getSwordSkill(entityplayer);
 	                    if (entityplayer.getRNG().nextDouble() <= j / 200D) {
 	                        i *= 2.0F;
+                            entityplayer.addChatComponentMessage(new ChatComponentTranslation("critical.attack", 2));
 	                        entityplayer.onCriticalHit(event.entityLiving);
 	                    }
 	                    i = i * (1.0F + j / 5 / 20F);

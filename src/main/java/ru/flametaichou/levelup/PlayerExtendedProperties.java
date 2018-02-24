@@ -13,6 +13,7 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
     private byte playerClass;
     private int airBars;
     private boolean clearEffects;
+    private long lastSkillActivation;
     private Map<String, Integer> skillMap = new HashMap<String, Integer>();
     private Map<String, int[]> counterMap = new HashMap<String, int[]>();
     public final static String[] counters = {"ore", "craft", "bonus"};
@@ -60,12 +61,25 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
     public boolean loadEffectData() {
         return clearEffects;
     }
+
+    /*
+     * Время последнего использования классовой способности
+     */
+
+    public void saveLastSkillActivation(long l) {
+        lastSkillActivation = l;
+    }
+
+    public long loadLastSkillActivation() {
+        return lastSkillActivation;
+    }
     
     @Override
     public void loadNBTData(NBTTagCompound compound) {
         playerClass = compound.getByte("Class");
         airBars = compound.getInteger("AirBars");
         clearEffects = compound.getBoolean("clearEffects");
+        lastSkillActivation = compound.getLong("lastSkillActivation");
         for (String name : ClassBonus.skillNames) {
             skillMap.put(name, compound.getInteger(name));
         }
@@ -165,13 +179,13 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
             setPlayerClass(clas);
     }
 
-    void setPlayerData(int[] data) {
+    public void setPlayerData(int[] data) {
         for (int i = 0; i < ClassBonus.skillNames.length && i < data.length; i++) {
             skillMap.put(ClassBonus.skillNames[i], data[i]);
         }
     }
 
-    int[] getPlayerData(boolean withClass) {
+    public int[] getPlayerData(boolean withClass) {
         int[] data = new int[ClassBonus.skillNames.length + (withClass ? 1 : 0)];
         for (int i = 0; i < ClassBonus.skillNames.length; i++)
             data[i] = getSkillFromIndex(ClassBonus.skillNames[i]);

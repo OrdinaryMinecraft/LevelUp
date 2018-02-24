@@ -21,6 +21,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.oredict.ShapedOreRecipe;
+import ru.flametaichou.levelup.Handlers.*;
 import ru.flametaichou.levelup.Items.ItemFishingLootBox;
 import ru.flametaichou.levelup.Items.ItemRespecBook;
 

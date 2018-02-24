@@ -2,20 +2,14 @@ package ru.flametaichou.levelup.Items;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.MathHelper;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-import net.minecraftforge.common.FishingHooks;
-import ru.flametaichou.levelup.FMLEventHandler;
-import ru.flametaichou.levelup.PlayerExtendedProperties;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,9 +56,7 @@ public class ItemFishingLootBox extends Item {
     @Override
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack itemStack, EntityPlayer entityPlayer, List list, boolean isAdvanced) {
-        if (itemStack.getItemDamage() > 0) {
-            list.add(StatCollector.translateToLocal("lootbox.fishing"));
-        }
+        list.add(StatCollector.translateToLocal("lootbox.fishing"));
     }
 
     public static void addItemsFishingLBList(List<String> itemlist) {

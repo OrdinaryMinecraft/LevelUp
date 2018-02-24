@@ -1,4 +1,4 @@
-package ru.flametaichou.levelup;
+package ru.flametaichou.levelup.Handlers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,22 +13,23 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityFishHook;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemDye;
 import net.minecraft.item.ItemHoe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.util.ForgeDirection;
+import ru.flametaichou.levelup.ClassBonus;
+import ru.flametaichou.levelup.LevelUp;
+import ru.flametaichou.levelup.PlayerExtendedProperties;
 
 public final class FMLEventHandler {
     /**
@@ -67,6 +68,14 @@ public final class FMLEventHandler {
             	removeEffects(player);
             	PlayerExtendedProperties.from(player).saveEffectData(false);
             }
+
+            //mining bonus for Miner class
+            if (player.worldObj.getWorldTime() % 50 == 0)
+            if (player.posY < 50 && PlayerExtendedProperties.getPlayerClass(player) == 1) {
+                player.addPotionEffect(new PotionEffect(Potion.digSpeed.id, 80, 0, true));
+            }
+
+
             //underwater bonus
     		if (player.isInWater())
     		{

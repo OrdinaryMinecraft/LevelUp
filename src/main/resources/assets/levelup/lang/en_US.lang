@@ -10,10 +10,15 @@ hud.skill.text1=Skill Points: %d
 hud.skill.text2=Class: %s
 hud.skill.select=Choose a Class (Press H)
 
-key.categories.gui=GUI
+key.categories.gui=LevelUp GUI
+key.keys.gui=LevelUp Menu
+key.keys.skill=Use Class Skill
+key.message.cooldown=Skill cooldown: %d
+miner.ores.none=No ores here!
+miner.ores.ore=The nearest ore is located:
 
 skill1.name=Mining
-skill1.tooltip1=Every 1: + chance: 2x ore drops
+skill1.tooltip1=Every 1: + chance: 2x ore drops, + chance find treasure while digging
 skill1.tooltip2=Every 5: + mining speed
 skill2.name=Sword
 skill2.tooltip1=Every 1: + chance: critical 2x damage
@@ -54,7 +59,7 @@ gui.class.title=Your Class: %s
 class0.name=<Нет>
 class0.tooltip= 
 class1.name=Miner
-class1.tooltip=Miner: +10 Mining, +5 Digging, +5 Defence | Extra XP from mining
+class1.tooltip=Miner: +10 Mining, +5 Digging, +5 Defence | Extra XP from mining, DigSpeed buff under y=60, skill = ore finder
 class2.name=Swordsman
 class2.tooltip=Swordsman: +10 Swords, +5 Defense, +5 Athletics | Extra XP from combat
 class3.name=Smith
@@ -87,6 +92,7 @@ config.levelup.option2=Render HUD on Exp Bar : %b
 config.levelup.option3=FOV is based on speed : %b
 
 sneak.attack=Sneak attack for %d x damage!
+critical.attack=Critical attack for %d x damage!
 rare.drop=Mob dropped rare item!
 rare.fish=You caught a rare item!
 fishing.lootbox=You caught a treasure chest!

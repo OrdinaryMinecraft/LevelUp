@@ -9,10 +9,15 @@ hud.skill.text1=Очки умений: %d
 hud.skill.text2=Класс: %s
 hud.skill.select=Выберите класс (Нажмите H)
 
-key.categories.gui=Интерфейс
+key.categories.gui=LevelUp интерфейс
+key.keys.gui=Меню LevelUp
+key.keys.skill=Актив. способность
+key.message.cooldown=Способность перезаряжается: %d
+miner.ores.none=Руд поблизости нет!
+miner.ores.ore=Ближайшая руда находится по координатам:
 
 skill1.name=Добыча
-skill1.tooltip1=Каждый 1: + шанс: 2x выпадение руды
+skill1.tooltip1=Каждый 1: + шанс: 2x выпадение руды, + шанс найти сокровище при копании
 skill1.tooltip2=Каждые 5: + скорость добычи
 skill2.name=Владение мечом
 skill2.tooltip1=Каждый 1: + шанс: нанесение критического 2х урона
@@ -53,7 +58,7 @@ gui.class.title=Ваш класс: %s
 class0.name=<Нет>
 class0.tooltip= 
 class1.name=Шахтёр
-class1.tooltip=Шахтёр: +10 Добыча, +5 Копание, +5 Защита | Дополнительный опыт от добычи
+class1.tooltip=Шахтёр: +10 Добыча, +5 Копание, +5 Защита | Дополнительный опыт от добычи, повышение скорости добычи ниже 60, способность "Поиск руд"
 class2.name=Мечник
 class2.tooltip=Мечник: +10 Мечи, +5 Защита, +5 Атлетика | Дополнительный опыт за бой
 class3.name=Кузнец
@@ -84,7 +89,8 @@ config.levelup.option0=Разрешить HUD : %b
 config.levelup.option1=Показывать HUD сверху слева : %b
 config.levelup.option2=Показывать HUD рядом с полоской опыта : %b
 
-sneak.attack=Скрытная атака - %d x урона!
+sneak.attack=Скрытная атака на %d x урона!
+critical.attack=Критический удар на %d x урона!
 rare.drop=Из моба выпал редкий предмет!
 rare.fish=Вы поймали редкий предмет!
 fishing.lootbox=Вы поймали сундук с сокровищами!

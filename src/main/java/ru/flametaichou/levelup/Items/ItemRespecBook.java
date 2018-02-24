@@ -8,7 +8,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-import ru.flametaichou.levelup.FMLEventHandler;
+import ru.flametaichou.levelup.Handlers.FMLEventHandler;
 import ru.flametaichou.levelup.PlayerExtendedProperties;
 
 import java.util.List;
