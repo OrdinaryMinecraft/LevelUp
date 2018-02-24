@@ -11,13 +11,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.EntityFX;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -27,6 +21,8 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.oredict.ShapedOreRecipe;
+import ru.flametaichou.levelup.Items.ItemFishingLootBox;
+import ru.flametaichou.levelup.Items.ItemRespecBook;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +37,9 @@ public final class LevelUp {
     public static SkillProxy proxy;
     private Property[] clientProperties;
     private Property[] serverProperties;
-    private static Item xpTalisman, respecBook;
+    private static Item xpTalisman;
+    private static Item respecBook;
+    public static Item fishingLootBox;
     private static Configuration config;
     public static boolean allowHUD = true, renderTopLeft = true, renderExpBar = false, changeFOV = true;
     private static boolean bonusMiningXP = true, bonusSmeltingXP = true, bonusRandomXP = true, bonusFightingXP = true, oreMiningXP = true;
@@ -78,20 +76,27 @@ public final class LevelUp {
         List<String> blackList = Arrays.asList(config.getStringList("Crops for farming", "BlackList", new String[]{"31"}, "That won't be affected by farming growth skill, uses internal block name. No sync to client needed."));
         FMLEventHandler.INSTANCE.addCropsToBlackList(blackList);
         List<String> itemList = Arrays.asList(config.getStringList("Item for loot", "ItemList", new String[]{"265","266","339","263","371","337","318","318","357"}, "Additional items dropping from mobs and looted from chests."));
-        List<String> itemRareList = Arrays.asList(config.getStringList("Item for loot (rare)", "itemRareList", new String[]{"264","388","354","372","384"}, "Rare items dropping from mobs and looted from chests."));
-        List<String> itemFishingList = Arrays.asList(config.getStringList("Item for fishing (rare)", "itemFishingList", new String[]{"264","388","372","384"}, "Rare items for fishing loot."));
+        List<String> itemRareList = Arrays.asList(config.getStringList("Item for loot (rare)", "itemRareList", new String[]{"264","388","372","384"}, "Rare items dropping from mobs and looted from chests."));
+        List<String> itemFishingList = Arrays.asList(config.getStringList("Item for fishing (rare)", "itemFishingList", new String[]{"264","388","372","384","368","378"}, "Rare items for fishing loot."));
+        List<String> itemFishingLB = Arrays.asList(config.getStringList("Item for fishing Loot Box", "itemFishingLB", new String[]{"2256","2257","2258","2259","2260","2261","2262","2263","2264","2265","2266","2267","264","388","368","418","419","322"}, "Items for fishing lootbox."));
         debugMode = config.getBoolean("Enable Debug Mode", "Cheats", false, "Enable debug messages in chat");
         MobEventHandler.addItemsToList(itemList, itemRareList);
         PlayerEventHandler.addItemsToFishingList(itemFishingList);
+        ItemFishingLootBox.addItemsFishingLBList(itemFishingLB);
         if (config.hasChanged())
             config.save();
+
+        fishingLootBox = new ItemFishingLootBox().setUnlocalizedName("fishingLootBox").setTextureName(ID + ":FishingLootBox").setCreativeTab(CreativeTabs.tabMisc);
+        GameRegistry.registerItem(fishingLootBox, "fishingLootBox");
+
         if (talismanEnabled) {
-            xpTalisman = new Item().setUnlocalizedName("xpTalisman").setTextureName(ID + ":XPTalisman").setCreativeTab(CreativeTabs.tabTools);
+            xpTalisman = new Item().setUnlocalizedName("xpTalisman").setTextureName(ID + ":XPTalisman").setCreativeTab(CreativeTabs.tabMisc);
             GameRegistry.registerItem(xpTalisman, "xpTalisman");
             GameRegistry.addRecipe(new ShapedOreRecipe(xpTalisman, "GG ", " R ", " GG", 'G', Items.gold_ingot, 'R', Items.ender_pearl));
         }
+
         if (bookEnabled) {
-            respecBook = new ItemRespecBook().setUnlocalizedName("respecBook").setTextureName(ID + ":RespecBook").setCreativeTab(CreativeTabs.tabTools);
+            respecBook = new ItemRespecBook().setUnlocalizedName("respecBook").setTextureName(ID + ":RespecBook").setCreativeTab(CreativeTabs.tabMisc);
             GameRegistry.registerItem(respecBook, "respecBook");
             ItemStack output = new ItemStack(respecBook);
             if (config.getBoolean("unlearning Book Reset Class", "Cheats", true, "Should unlearning book also remove class")) {
@@ -100,9 +105,11 @@ public final class LevelUp {
             GameRegistry.addRecipe(output, "OEO", "DBD", "ODO", 'O', Blocks.obsidian, 'D', new ItemStack(Items.dye),
                     'E', Items.ender_pearl, 'B', Items.book);
         }
+
         if (event.getSourceFile().getName().endsWith(".jar")) {
             proxy.tryUseMUD();
         }
+
         FMLCommonHandler.instance().bus().register(FMLEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(new PlayerEventHandler());
         MinecraftForge.EVENT_BUS.register(new MobEventHandler());
@@ -191,43 +198,50 @@ public final class LevelUp {
         }
     }
 
+    public static void giveBonusSmeltingXP(EntityPlayer player) {
+	    if (bonusSmeltingXP) {
+	        byte pClass = PlayerExtendedProperties.getPlayerClass(player);
+	        if (pClass == 2) {
+	            runBonusCounting(player, 1);
+	        }
+	    }
+    }
+
     public static void giveBonusFightingXP(EntityPlayer player) {
         if (bonusFightingXP) {
             byte pClass = PlayerExtendedProperties.getPlayerClass(player);
-            if (pClass == 2 || pClass == 5 || pClass == 8 || pClass == 11) {
+            if (pClass == 8) {
                 player.addExperience(2);
             }
         }
     }
 
-    public static void giveBonusSmeltingXP(EntityPlayer player) {
-	    if (bonusSmeltingXP) {
-	        byte pClass = PlayerExtendedProperties.getPlayerClass(player);
-	        if (pClass == 3 || pClass == 6 || pClass == 9 || pClass == 12) {
-	            runBonusCounting(player, 1);
-	        }
-	    }
+    public static void giveBonusFishingXP(EntityPlayer player) {
+        byte pClass = PlayerExtendedProperties.getPlayerClass(player);
+        if (pClass == 9) {
+            player.addExperience(2);
+        }
+    }
+
+    public static void giveBonusMiningXP(EntityPlayer player) {
+        if (bonusMiningXP) {
+            byte pClass = PlayerExtendedProperties.getPlayerClass(player);
+            if (pClass == 1) {
+                runBonusCounting(player, 0);
+            }
+        }
     }
     
     public static void giveBonusRandomXP(EntityPlayer player) {
     if (bonusRandomXP) {
         byte pClass = PlayerExtendedProperties.getPlayerClass(player);
-        if (pClass == 13) {
+        if (pClass == 13 || pClass == 10) {
             player.addExperience(1);
        		}
     	}
     	if (player.inventory.hasItem(xpTalisman)) {
     		player.addExperience(2);
    		}
-    }
-    
-    public static void giveBonusMiningXP(EntityPlayer player) {
-        if (bonusMiningXP) {
-            byte pClass = PlayerExtendedProperties.getPlayerClass(player);
-            if (pClass == 1 || pClass == 4 || pClass == 7 || pClass == 10) {
-                runBonusCounting(player, 0);
-            }
-        }
     }
 
     private static void runBonusCounting(EntityPlayer player, int type) {

@@ -34,6 +34,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
 import net.minecraftforge.event.entity.player.PlayerPickupXpEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.oredict.OreDictionary;
+import ru.flametaichou.levelup.Items.ItemFishingLootBox;
 
 import java.util.*;
 
@@ -143,9 +144,7 @@ public final class PlayerEventHandler {
     public void onInteract(PlayerInteractEvent event) {
         if (event.useItem != Event.Result.DENY)
             /*
-            *
             * Fishing skill
-            *
             */
             if (event.action == Action.RIGHT_CLICK_AIR) {
                 EntityFishHook hook = event.entityPlayer.fishEntity;
@@ -167,6 +166,7 @@ public final class PlayerEventHandler {
                             entityitem.motionZ = d5 * d9;
                             hook.worldObj.spawnEntityInWorld(entityitem);
 
+                            //Здесь добавляем к пойманному луту бонусный
                             EntityItem bonusLoot = null;
                             if (loot >=0)
                                 bonusLoot = new EntityItem(hook.worldObj, hook.posX, hook.posY, hook.posZ, new ItemStack (Item.getItemById(Integer.parseInt(bonusFishingLootList.get(loot)))));
@@ -177,7 +177,23 @@ public final class PlayerEventHandler {
                                 hook.worldObj.spawnEntityInWorld(bonusLoot);
                                 event.entityPlayer.addChatComponentMessage(new ChatComponentTranslation("rare.fish"));
                             }
+
+                            //Здесь добавляем к пойманному луту сундук с сокровищами, если класс игрока - рыбак
+                            bonusLoot = null;
+                            byte pClass = PlayerExtendedProperties.getPlayerClass(event.entityPlayer);
+                            if (pClass == 9) {
+                                double d = Math.random();
+                                if (d < 0.03) {
+                                    bonusLoot = new EntityItem(hook.worldObj, hook.posX, hook.posY, hook.posZ, new ItemStack(LevelUp.fishingLootBox));
+                                    bonusLoot.motionX = d1 * d9;
+                                    bonusLoot.motionY = d3 * d9 + (double) MathHelper.sqrt_double(d7) * 0.08D;
+                                    bonusLoot.motionZ = d5 * d9;
+                                    hook.worldObj.spawnEntityInWorld(bonusLoot);
+                                    event.entityPlayer.addChatComponentMessage(new ChatComponentTranslation("fishing.lootbox"));
+                                }
+                            }
                             hook.field_146042_b.worldObj.spawnEntityInWorld(new EntityXPOrb(hook.field_146042_b.worldObj, hook.field_146042_b.posX, hook.field_146042_b.posY + 0.5D, hook.field_146042_b.posZ + 0.5D, random.nextInt(6) + 1));
+                            LevelUp.giveBonusFishingXP(event.entityPlayer);
                         }
                     }
 

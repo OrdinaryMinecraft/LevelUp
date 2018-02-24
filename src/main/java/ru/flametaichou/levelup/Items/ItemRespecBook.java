@@ -1,4 +1,4 @@
-package ru.flametaichou.levelup;
+package ru.flametaichou.levelup.Items;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -8,6 +8,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
+import ru.flametaichou.levelup.FMLEventHandler;
+import ru.flametaichou.levelup.PlayerExtendedProperties;
 
 import java.util.List;
 

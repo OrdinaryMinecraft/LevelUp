@@ -1,8 +1,10 @@
 ﻿
 item.respecBook.name=Book of Unlearning
 item.xpTalisman.name=Talisman of Wonder
+item.fishingLootBox.name=Treasure Chest
 
-respecbook.canresetclass=This book will also reset your class.
+respecbook.canresetclass=This book will also reset your class
+lootbox.fishing=Box with random treasures from sea
 
 hud.skill.text1=Skill Points: %d
 hud.skill.text2=Class: %s
@@ -41,8 +43,8 @@ skill10.name=Farming
 skill10.tooltip1=Every 1: + crop grow speed
 skill10.tooltip2=Every 5: + chance: 2x wheat drops
 skill11.name=Fishing
-skill11.tooltip1=Every 1: + chance: getting a bite
-skill11.tooltip2=Every 5: + chance: fish up loot
+skill11.tooltip1=Every 1: + chance getting a bite
+skill11.tooltip2=Every 5: + chance fish up rare loot
 skill12.name=Digging
 skill12.tooltip1=Every 1: + chance: digging up loot
 skill12.tooltip2=Every 5: + chance: flint from gravel
@@ -87,4 +89,5 @@ config.levelup.option3=FOV is based on speed : %b
 sneak.attack=Sneak attack for %d x damage!
 rare.drop=Mob dropped rare item!
 rare.fish=You caught a rare item!
+fishing.lootbox=You caught a treasure chest!
 water.count=You have %d reserved air bars left

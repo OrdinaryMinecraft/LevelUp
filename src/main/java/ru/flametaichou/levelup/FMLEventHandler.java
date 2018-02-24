@@ -124,7 +124,9 @@ public final class FMLEventHandler {
                 }
             }
 
-            //Fishing
+            /*
+             * Fishing skill
+             */
             int skillFishing = getSkill(player, 10);
             if (skillFishing > 0)
             if (event.player.fishEntity != null) {
