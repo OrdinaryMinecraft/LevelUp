@@ -1,15 +1,14 @@
 package ru.flametaichou.levelup.Handlers;
 
+import java.util.List;
 import java.util.Random;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EntityDamageSourceIndirect;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.*;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
@@ -33,7 +32,7 @@ public final class FightEventHandler {
                 if (PlayerExtendedProperties.from(player).loadAirData() > 0) {
                 	event.setCanceled(true);
                 	player.setAir(300);
-                	PlayerExtendedProperties.from(player).saveAirData(PlayerExtendedProperties.from(player).loadAirData()-1);
+                	PlayerExtendedProperties.from(player).sendAirData(PlayerExtendedProperties.from(player).loadAirData()-1);
                     player.addChatComponentMessage(new ChatComponentTranslation("water.count", PlayerExtendedProperties.from(player).loadAirData()));
                     }
                 }
@@ -49,6 +48,27 @@ public final class FightEventHandler {
 	        float damage = event.ammount;
 	        if (damagesource.getEntity() instanceof EntityPlayer) {
 	            EntityPlayer entityplayer = (EntityPlayer) damagesource.getEntity();
+                EntityLivingBase victim = event.entityLiving;
+	            //Swordsman splash bonus
+                //TODO дописать вероятность
+                int playerClass = PlayerExtendedProperties.getPlayerClass(entityplayer);
+                if (playerClass == 2) {
+                    int radius = 1;
+                    List e = victim.worldObj.getEntitiesWithinAABB(EntityLiving.class, AxisAlignedBB.getBoundingBox(victim.posX-radius, victim.posY-radius, victim.posZ-radius, (victim.posX + radius),(victim.posY + radius),(victim.posZ + radius)));
+                    if (e.size() > 0) {
+                        entityplayer.worldObj.playSoundEffect(entityplayer.posX, entityplayer.posY, entityplayer.posZ, "random.anvil_land", 2F, 0.5F + random.nextFloat() * 0.2F);
+
+                        for (int j = 0; j <= e.size() - 1; j++) {
+                            EntityLiving em = (EntityLiving) e.get(j);
+                            System.out.println(em);
+                            damagesource.setMagicDamage();
+                            em.attackEntityFrom(damagesource, damage*5);
+                        }
+
+                    }
+                }
+
+                //Swords skill
 	            if (LevelUp.debugMode) entityplayer.addChatComponentMessage(new ChatComponentTranslation("Damage without mod " + String.valueOf(i)));
 	            if (damagesource instanceof EntityDamageSourceIndirect) {
 	                if (damagesource.damageType.equals("arrow")) {
@@ -121,7 +141,7 @@ public final class FightEventHandler {
                 	player.getEntityWorld().playAuxSFX(2005, (int) player.posX-1, (int) player.posY+1, (int) player.posZ, 0);
                 	player.worldObj.playSoundEffect(player.posX, player.posY, player.posZ, "random.levelup", 2.0F, 1.5F + random.nextFloat() * 0.2F);
                 	
-                	PlayerExtendedProperties.from(player).saveEffectData(true);
+                	PlayerExtendedProperties.from(player).sendEffectData(true);
                 }
             }
         }

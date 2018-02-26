@@ -3,17 +3,19 @@ package ru.flametaichou.levelup.Handlers;
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.InputEvent;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import cpw.mods.fml.relauncher.Side;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraftforge.oredict.OreDictionary;
 import org.lwjgl.input.Keyboard;
-import ru.flametaichou.levelup.GuiClasses;
-import ru.flametaichou.levelup.GuiSkills;
-import ru.flametaichou.levelup.LevelUpHUD;
-import ru.flametaichou.levelup.PlayerExtendedProperties;
+import ru.flametaichou.levelup.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,9 +42,10 @@ public final class SkillKeyHandler {
 
             EntityPlayer player = Minecraft.getMinecraft().thePlayer;
             int playerClass = PlayerExtendedProperties.getPlayerClass(player);
-            int skillColldown = 20 * 120;
+            int skillColldown = 20 * 1;
 
             if (player.worldObj.getTotalWorldTime() - PlayerExtendedProperties.from(player).loadLastSkillActivation() > skillColldown) {
+                //Miner
                 if (playerClass == 1) {
                     int radius = 10;
                     int player_x = (int) player.posX;
@@ -80,6 +83,8 @@ public final class SkillKeyHandler {
                         }
                     }
 
+                    //TODO добавить звук
+
                     if (blocks.isEmpty())
                         player.addChatComponentMessage(new ChatComponentTranslation("miner.ores.none"));
                     else {
@@ -87,7 +92,19 @@ public final class SkillKeyHandler {
                         player.addChatComponentMessage(new ChatComponentTranslation("X:" + ore_x + " Y:" + ore_y + " Z:" + ore_z));
                     }
                 }
-                PlayerExtendedProperties.from(player).saveLastSkillActivation(player.worldObj.getTotalWorldTime());
+
+                //Marksman
+                if (playerClass == 5) {
+                    PlayerExtendedProperties.from(player).sendDoubleShotCount(3);
+                }
+
+                //Swordsman
+                if (playerClass == 2) {
+                    FMLProxyPacket packet = SkillPacketHandler.getOtherPacket(Side.SERVER, "swordsmanBuff");
+                    LevelUp.otherChannel.sendToServer(packet);
+                }
+
+                PlayerExtendedProperties.from(player).sendLastSkillActivation(player.worldObj.getTotalWorldTime());
             } else {
                 long timeDiff = player.worldObj.getTotalWorldTime() - PlayerExtendedProperties.from(player).loadLastSkillActivation();
                 player.addChatComponentMessage(new ChatComponentTranslation("key.message.cooldown", skillColldown / 20 - timeDiff / 20));

@@ -8,6 +8,7 @@ import java.util.UUID;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.block.Block;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -63,10 +64,11 @@ public final class FMLEventHandler {
     public void onPlayerUpdate(TickEvent.PlayerTickEvent event) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
         if (event.phase == TickEvent.Phase.START) {
             EntityPlayer player = event.player;
+
             //clear effects
             if (PlayerExtendedProperties.from(player).loadEffectData()) {
-            	removeEffects(player);
-            	PlayerExtendedProperties.from(player).saveEffectData(false);
+                removeEffects(player);
+                PlayerExtendedProperties.from(player).sendEffectData(false);
             }
 
             //mining bonus for Miner class
@@ -74,7 +76,6 @@ public final class FMLEventHandler {
             if (player.posY < 50 && PlayerExtendedProperties.getPlayerClass(player) == 1) {
                 player.addPotionEffect(new PotionEffect(Potion.digSpeed.id, 80, 0, true));
             }
-
 
             //underwater bonus
     		if (player.isInWater())
@@ -86,7 +87,7 @@ public final class FMLEventHandler {
     		}
     		else if (!flagSetCounter) {
     			int bonus = getSkill(player, 7);
-    			PlayerExtendedProperties.from(player).saveAirData(bonus / 5);
+    			PlayerExtendedProperties.from(player).sendAirData(bonus / 5);
     			flagSetCounter = true;
     		}
    
@@ -301,6 +302,10 @@ public final class FMLEventHandler {
             byte cl = PlayerExtendedProperties.getPlayerClass(player);
             int[] data = PlayerExtendedProperties.from(player).getPlayerData(false);
             LevelUp.initChannel.sendTo(SkillPacketHandler.getPacket(Side.CLIENT, 0, cl, data), (EntityPlayerMP) player);
+            //getExtPropsFromServer
+            FMLProxyPacket packet = SkillPacketHandler.getExtPropPacket(Side.CLIENT, PlayerExtendedProperties.from(player).loadExtendedProperties().toString());
+            LevelUp.extPropertiesChannel.sendTo(packet, (EntityPlayerMP) player);
         }
     }
+
 }

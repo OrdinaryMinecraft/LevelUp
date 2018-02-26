@@ -62,7 +62,6 @@ public class MobEventHandler {
 					double d = Math.random() * 100;
 					if (d < bonus / 5 * 5) {
 						event.drops.clone();
-						System.out.println("cloned");
 					}
 				}
 			}

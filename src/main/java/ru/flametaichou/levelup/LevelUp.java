@@ -44,7 +44,7 @@ public final class LevelUp {
     private static Configuration config;
     public static boolean allowHUD = true, renderTopLeft = true, renderExpBar = false, changeFOV = true;
     private static boolean bonusMiningXP = true, bonusSmeltingXP = true, bonusRandomXP = true, bonusFightingXP = true, oreMiningXP = true;
-    public static FMLEventChannel initChannel, skillChannel, classChannel, configChannel;
+    public static FMLEventChannel initChannel, skillChannel, classChannel, configChannel, extPropertiesChannel, otherChannel;
 	public static boolean debugMode;
 
     @EventHandler
@@ -60,6 +60,10 @@ public final class LevelUp {
         skillChannel.register(sk);
         configChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(SkillPacketHandler.CHAN[3]);
         configChannel.register(sk);
+        extPropertiesChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(SkillPacketHandler.CHAN[4]);
+        extPropertiesChannel.register(sk);
+        otherChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(SkillPacketHandler.CHAN[5]);
+        otherChannel.register(sk);
         proxy.registerGui();
     }
 

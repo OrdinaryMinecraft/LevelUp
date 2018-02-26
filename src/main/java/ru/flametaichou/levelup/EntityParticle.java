@@ -19,13 +19,5 @@ public class EntityParticle extends EntityAuraFX
         particleScale = 3.0F;
         setRBGColorF(0x255, 0x255, 0x255);
     }
-    
-	public static void onHeal(Entity entity) {
-		if (!entity.worldObj.isRemote)
-		System.out.println("hello2");
-		if (entity.worldObj.isRemote)
-		System.out.println("hello1");
-	}
-    
 
 }

@@ -9,13 +9,16 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.common.config.Property;
 import ru.flametaichou.levelup.ClassBonus;
 import ru.flametaichou.levelup.LevelUp;
+import ru.flametaichou.levelup.Model.ExtPropPacket;
 import ru.flametaichou.levelup.PlayerExtendedProperties;
 
 public final class SkillPacketHandler {
-    public static final String[] CHAN = {"LEVELUPINIT", "LEVELUPCLASSES", "LEVELUPSKILLS", "LEVELUPCFG"};
+    public static final String[] CHAN = {"LEVELUPINIT", "LEVELUPCLASSES", "LEVELUPSKILLS", "LEVELUPCFG", "LEVELUPEXTPROP", "LEVELUPOTHER"};
 
     @SubscribeEvent
     public void onServerPacket(FMLNetworkEvent.ServerCustomPacketEvent event) {
@@ -25,6 +28,10 @@ public final class SkillPacketHandler {
             handlePacket(event.packet, ((NetHandlerPlayServer) event.handler).playerEntity);
             //increase HP
             FMLEventHandler.INSTANCE.updatePlayerHP(((NetHandlerPlayServer) event.handler).playerEntity);
+        } if (event.packet.channel().equals(CHAN[4])) {
+            handleExtPropsChange(event.packet, ((NetHandlerPlayServer) event.handler).playerEntity);
+        } if (event.packet.channel().equals(CHAN[5])) {
+            handleOtherPacket(event.packet, ((NetHandlerPlayServer) event.handler).playerEntity);
         }
     }
 
@@ -32,6 +39,34 @@ public final class SkillPacketHandler {
         if (newClass >= 0) {
             PlayerExtendedProperties.from(entityPlayerMP).setPlayerClass(newClass);
             FMLEventHandler.INSTANCE.loadPlayer(entityPlayerMP);
+        }
+    }
+
+    private void handleExtPropsChange(FMLProxyPacket pckt, EntityPlayer entityPlayerMP) {
+        ByteBuf buf = pckt.payload();
+        String packetString = "";
+        for (byte bt : buf.array()) {
+            if (bt != 0)
+                packetString += (char) bt;
+        }
+        ExtPropPacket packet = ExtPropPacket.fromString(packetString);
+        PlayerExtendedProperties.from(entityPlayerMP).saveAirData(packet.airData);
+        PlayerExtendedProperties.from(entityPlayerMP).saveEffectData(packet.effectData);
+        PlayerExtendedProperties.from(entityPlayerMP).saveDoubleShotCount(packet.doubleShotData);
+        PlayerExtendedProperties.from(entityPlayerMP).saveLastSkillActivation(packet.skillCooldownData);
+        //FMLEventHandler.INSTANCE.loadPlayer(entityPlayerMP);
+    }
+
+    private void handleOtherPacket(FMLProxyPacket pckt, EntityPlayer entityPlayerMP) {
+        ByteBuf buf = pckt.payload();
+        String packetString = "";
+        for (byte bt : buf.array()) {
+            if (bt != 0)
+                packetString += (char) bt;
+        }
+        if (packetString.equals("swordsmanBuff")) {
+            entityPlayerMP.worldObj.playSoundEffect(entityPlayerMP.posX, entityPlayerMP.posY, entityPlayerMP.posZ, "mob.endermen.stare", 1.0F, 5F);
+            entityPlayerMP.addPotionEffect(new PotionEffect(Potion.moveSpeed.id, 20, 9, true));
         }
     }
 
@@ -100,6 +135,28 @@ public final class SkillPacketHandler {
         }
         FMLProxyPacket pkt = new FMLProxyPacket(buf, CHAN[3]);
         pkt.setTarget(Side.CLIENT);
+        return pkt;
+    }
+
+    public static FMLProxyPacket getExtPropPacket(Side side, String data) {
+        char[] dat = data.toCharArray();
+        ByteBuf buf = Unpooled.buffer();
+        for (int i = 0; i < dat.length; i++) {
+            buf.writeByte(dat[i]);
+        }
+        FMLProxyPacket pkt = new FMLProxyPacket(buf, CHAN[4]);
+        pkt.setTarget(side);
+        return pkt;
+    }
+
+    public static FMLProxyPacket getOtherPacket(Side side, String data) {
+        char[] dat = data.toCharArray();
+        ByteBuf buf = Unpooled.buffer();
+        for (int i = 0; i < dat.length; i++) {
+            buf.writeByte(dat[i]);
+        }
+        FMLProxyPacket pkt = new FMLProxyPacket(buf, CHAN[5]);
+        pkt.setTarget(side);
         return pkt;
     }
 
