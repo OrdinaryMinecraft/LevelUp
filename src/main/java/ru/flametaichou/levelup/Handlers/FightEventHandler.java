@@ -25,6 +25,7 @@ public final class FightEventHandler {
     @SubscribeEvent
     public void onAttacked(LivingAttackEvent event) {
         DamageSource damagesource = event.source;
+
         // air bars
     	if (damagesource.equals(DamageSource.drown)) {
     		if (event.entityLiving instanceof EntityPlayer) {
@@ -69,10 +70,13 @@ public final class FightEventHandler {
                 }
 
                 //Swords skill
+                //Archery skill
 	            if (LevelUp.debugMode) entityplayer.addChatComponentMessage(new ChatComponentTranslation("Damage without mod " + String.valueOf(i)));
 	            if (damagesource instanceof EntityDamageSourceIndirect) {
 	                if (damagesource.damageType.equals("arrow")) {
-	                    i = i * (1.0F + BowEventHandler.getArcherSkill(entityplayer) / 100F);
+                        System.out.println("До: " + i);
+                        i = i * (1.0F + BowEventHandler.getArcherSkill(entityplayer) / 100F);
+                        System.out.println("После: " + i);
 	                }
 	                if (getDistance(event.entityLiving, entityplayer) < 256F && entityplayer.isSneaking() && !canSeePlayer(event.entityLiving) && !entityIsFacing(event.entityLiving, entityplayer)) {
 	                    i = i * 1.5F;

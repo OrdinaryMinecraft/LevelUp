@@ -2,22 +2,15 @@ package ru.flametaichou.levelup.Handlers;
 
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
-import cpw.mods.fml.relauncher.Side;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Items;
-import net.minecraft.inventory.Slot;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Vec3;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
-import ru.flametaichou.levelup.LevelUp;
+import ru.flametaichou.levelup.Entity.EntityBonusArrow;
+import ru.flametaichou.levelup.Entity.EntityCustomArrow;
 import ru.flametaichou.levelup.PlayerExtendedProperties;
 
 import java.util.Random;
@@ -35,13 +28,13 @@ public final class BowEventHandler {
             if (arrow.shootingEntity instanceof EntityPlayer) {
                 EntityPlayer archer = (EntityPlayer) arrow.shootingEntity;
 
-                //Archery skill
-                int archerSkill = getArcherSkill(archer);
-                if (archerSkill != 0) {
-                    arrow.motionX *= 1.0F + archerSkill / 100F;
-                    arrow.motionY *= 1.0F + archerSkill / 100F;
-                    arrow.motionZ *= 1.0F + archerSkill / 100F;
-                }
+//                //Archery skill
+//                int archerSkill = getArcherSkill(archer);
+//                if (archerSkill != 0) {
+//                    arrow.motionX *= 1.0F + archerSkill / 100F;
+//                    arrow.motionY *= 1.0F + archerSkill / 100F;
+//                    arrow.motionZ *= 1.0F + archerSkill / 100F;
+//                }
 
                 if (PlayerExtendedProperties.getPlayerClass(archer) == 5 && !arrow.isSneaking()) {
 
@@ -58,11 +51,13 @@ public final class BowEventHandler {
                             }
                         }
 
+                        Random random = new Random();
+
                         if (countArrows > 0 || archer.capabilities.isCreativeMode) {
-                            Random random = new Random();
-                            int bonusArrows = 1;
+                            int bonusArrows = 2;
                             for (int i=0; i < bonusArrows; i++) {
-                                EntityArrow arrow2 = new EntityArrow(arrow.worldObj, archer, 0);
+                                EntityCustomArrow arrow2 = new EntityCustomArrow(arrow.worldObj, archer, 0);
+                                arrow2.setDamage(arrow.getDamage());
                                 arrow2.posX = arrow.posX + 0.1 + random.nextFloat() * (-0.1 - 0.1);
                                 arrow2.posY = arrow.posY + 0.1 + random.nextFloat() * (-0.1 - 0.1);
                                 arrow2.posZ = arrow.posZ + 0.1 + random.nextFloat() * (-0.1 - 0.1);
@@ -75,12 +70,15 @@ public final class BowEventHandler {
                                 if (PlayerExtendedProperties.from(archer).loadFireShotCount() <= 0) arrow2.setFire(2);
                                 arrow2.setSneaking(true);
 
-                                if (!archer.capabilities.isCreativeMode) {
-                                    archer.inventory.consumeInventoryItem(Items.arrow);
-                                }
+                                if (i != 0)
+                                    if (!archer.capabilities.isCreativeMode) {
+                                        archer.inventory.consumeInventoryItem(Items.arrow);
+                                    }
 
                                 arrow.worldObj.spawnEntityInWorld(arrow2);
                             }
+                            if (arrow.isEntityAlive())
+                            arrow.setDead();
 
                             PlayerExtendedProperties.from(archer).sendDoubleShotCount(PlayerExtendedProperties.from(archer).loadDoubleShotCount() - 1);
                         }
@@ -102,12 +100,14 @@ public final class BowEventHandler {
         }
     }
 
+    //Archery skill
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onBowUse(PlayerUseItemEvent.Start event) {
         if (event.item != null && event.item.getMaxStackSize() == 1 && event.item.getItemUseAction() == EnumAction.bow) {
             int archer = getArcherSkill(event.entityPlayer);
-            if (archer != 0 && event.duration > archer / 5)
+            if (archer != 0 && event.duration > archer / 5) {
                 event.duration -= (archer / 5);
+            }
         }
     }
 
