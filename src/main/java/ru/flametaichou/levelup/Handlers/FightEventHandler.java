@@ -50,20 +50,20 @@ public final class FightEventHandler {
 	        if (damagesource.getEntity() instanceof EntityPlayer) {
 	            EntityPlayer entityplayer = (EntityPlayer) damagesource.getEntity();
                 EntityLivingBase victim = event.entityLiving;
+
 	            //Swordsman splash bonus
-                //TODO дописать вероятность
                 int playerClass = PlayerExtendedProperties.getPlayerClass(entityplayer);
-                if (playerClass == 2) {
+                if (playerClass == 2 && Math.random() <= 0.90 &&
+                        (entityplayer.getHeldItem().getItem().getUnlocalizedName().contains("sword") || entityplayer.getHeldItem().getItem().getUnlocalizedName().contains("Sword"))) {
                     int radius = 1;
                     List e = victim.worldObj.getEntitiesWithinAABB(EntityLiving.class, AxisAlignedBB.getBoundingBox(victim.posX-radius, victim.posY-radius, victim.posZ-radius, (victim.posX + radius),(victim.posY + radius),(victim.posZ + radius)));
                     if (e.size() > 0) {
-                        entityplayer.worldObj.playSoundEffect(entityplayer.posX, entityplayer.posY, entityplayer.posZ, "random.anvil_land", 2F, 0.5F + random.nextFloat() * 0.2F);
+                        entityplayer.worldObj.playSoundEffect(entityplayer.posX, entityplayer.posY, entityplayer.posZ, "mob.irongolem.hit", 1F, 2F + random.nextFloat() * 0.2F);
 
                         for (int j = 0; j <= e.size() - 1; j++) {
                             EntityLiving em = (EntityLiving) e.get(j);
-                            System.out.println(em);
                             damagesource.setMagicDamage();
-                            em.attackEntityFrom(damagesource, damage*5);
+                            em.attackEntityFrom(damagesource, damage * 0.3F);
                         }
 
                     }

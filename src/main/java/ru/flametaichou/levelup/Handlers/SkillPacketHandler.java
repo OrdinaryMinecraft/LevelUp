@@ -65,8 +65,9 @@ public final class SkillPacketHandler {
                 packetString += (char) bt;
         }
         if (packetString.equals("swordsmanBuff")) {
-            entityPlayerMP.worldObj.playSoundEffect(entityPlayerMP.posX, entityPlayerMP.posY, entityPlayerMP.posZ, "mob.endermen.stare", 1.0F, 5F);
+            entityPlayerMP.worldObj.playSoundEffect(entityPlayerMP.posX, entityPlayerMP.posY, entityPlayerMP.posZ, "mob.irongolem.throw", 1.0F, 0.5F);
             entityPlayerMP.addPotionEffect(new PotionEffect(Potion.moveSpeed.id, 20, 9, true));
+            entityPlayerMP.addPotionEffect(new PotionEffect(Potion.damageBoost.id, 20, 1, true));
         }
     }
 
