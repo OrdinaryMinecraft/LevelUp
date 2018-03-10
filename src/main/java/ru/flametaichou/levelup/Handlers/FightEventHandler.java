@@ -53,7 +53,7 @@ public final class FightEventHandler {
 
 	            //Swordsman splash bonus
                 int playerClass = PlayerExtendedProperties.getPlayerClass(entityplayer);
-                if (playerClass == 2 && Math.random() <= 0.90 &&
+                if (playerClass == 2 && Math.random() <= 0.20 &&
                         (entityplayer.getHeldItem().getItem().getUnlocalizedName().contains("sword") || entityplayer.getHeldItem().getItem().getUnlocalizedName().contains("Sword"))) {
                     int radius = 1;
                     List e = victim.worldObj.getEntitiesWithinAABB(EntityLiving.class, AxisAlignedBB.getBoundingBox(victim.posX-radius, victim.posY-radius, victim.posZ-radius, (victim.posX + radius),(victim.posY + radius),(victim.posZ + radius)));
@@ -74,9 +74,7 @@ public final class FightEventHandler {
 	            if (LevelUp.debugMode) entityplayer.addChatComponentMessage(new ChatComponentTranslation("Damage without mod " + String.valueOf(i)));
 	            if (damagesource instanceof EntityDamageSourceIndirect) {
 	                if (damagesource.damageType.equals("arrow")) {
-                        System.out.println("До: " + i);
                         i = i * (1.0F + BowEventHandler.getArcherSkill(entityplayer) / 100F);
-                        System.out.println("После: " + i);
 	                }
 	                if (getDistance(event.entityLiving, entityplayer) < 256F && entityplayer.isSneaking() && !canSeePlayer(event.entityLiving) && !entityIsFacing(event.entityLiving, entityplayer)) {
 	                    i = i * 1.5F;

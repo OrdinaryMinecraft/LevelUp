@@ -15,8 +15,10 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
@@ -116,6 +118,7 @@ public final class LevelUp {
         }
 
         FMLCommonHandler.instance().bus().register(FMLEventHandler.INSTANCE);
+        FMLCommonHandler.instance().bus().register(PlayerEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(new PlayerEventHandler());
         MinecraftForge.EVENT_BUS.register(new MobEventHandler());
     }
@@ -206,7 +209,7 @@ public final class LevelUp {
     public static void giveBonusSmeltingXP(EntityPlayer player) {
 	    if (bonusSmeltingXP) {
 	        byte pClass = PlayerExtendedProperties.getPlayerClass(player);
-	        if (pClass == 2) {
+	        if (pClass == 3) {
 	            runBonusCounting(player, 1);
 	        }
 	    }
@@ -292,4 +295,5 @@ public final class LevelUp {
 	public static void takenFromSmelting(EntityPlayer player, ItemStack smelting) {
         giveBonusSmeltingXP(player);
 	}
+
 }

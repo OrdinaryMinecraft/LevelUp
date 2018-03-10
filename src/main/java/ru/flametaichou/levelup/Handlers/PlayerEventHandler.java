@@ -24,14 +24,14 @@ import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.FishingHooks;
 import net.minecraftforge.common.IExtendedEntityProperties;
+import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.*;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
-import net.minecraftforge.event.entity.player.PlayerPickupXpEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.oredict.OreDictionary;
 import ru.flametaichou.levelup.ClassBonus;
@@ -70,6 +70,8 @@ public final class PlayerEventHandler {
     /**
      * Internal ore counter
      */
+    public static final PlayerEventHandler INSTANCE = new PlayerEventHandler();
+
     private static Map<Block, Integer> blockToCounter = new IdentityHashMap<Block, Integer>();
 
     static {
@@ -320,6 +322,38 @@ public final class PlayerEventHandler {
                 itr.remove();
             }
         }
+    }
+
+    @SubscribeEvent
+    public void onTooltipItem(ItemTooltipEvent event) {
+        if (event.itemStack.getTagCompound() != null) {
+            //System.out.println(event.itemStack.getTagCompound());
+            if (event.itemStack.getTagCompound().getString("Smith") != "") {
+                String lore = StatCollector.translateToLocal("smith.tooltip") + " " + event.itemStack.getTagCompound().getString("Smith");
+                event.toolTip.set(2, lore);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onAnvilUpdate(AnvilRepairEvent event) {
+//        if(e.crafting.getItem().equals(Tools.RubyAxe)){
+//            e.player.addStat(Achievements.achievementRubyAxe, 1);
+//        }
+        System.out.println(event.right);
+        System.out.println(event.right.getTagCompound());
+        writeSmithInfo(event.right, event.entityPlayer);
+    }
+
+    public static void writeSmithInfo(ItemStack craftedItem, EntityPlayer player) {
+        NBTTagCompound tagCompound = craftedItem.getTagCompound();
+        if (tagCompound == null)
+            tagCompound = new NBTTagCompound();
+        craftedItem.setTagCompound(tagCompound);
+        tagCompound.setString("Smith", player.getDisplayName());
+        craftedItem.setTagCompound(tagCompound);
+        System.out.println(craftedItem);
+        System.out.println(tagCompound);
     }
 
     /**
