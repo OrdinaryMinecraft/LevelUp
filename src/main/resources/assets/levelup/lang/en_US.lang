@@ -97,4 +97,6 @@ rare.drop=Mob dropped rare item!
 rare.fish=You caught a rare item!
 fishing.lootbox=You caught a treasure chest!
 water.count=You have %d reserved air bars left
-smith.tooltip=Forged by blacksmith:
+tooltip.smith=Forged by blacksmith:
+tooltip.damage=Bonus damage:
+tooltip.crit=Bonus crit:

@@ -329,28 +329,45 @@ public final class PlayerEventHandler {
         if (event.itemStack.getTagCompound() != null) {
             //System.out.println(event.itemStack.getTagCompound());
             if (event.itemStack.getTagCompound().getString("Smith") != "") {
-                String lore = StatCollector.translateToLocal("smith.tooltip") + " " + event.itemStack.getTagCompound().getString("Smith");
-                event.toolTip.set(2, lore);
+                String lore = StatCollector.translateToLocal("tooltip.smith") + " " + event.itemStack.getTagCompound().getString("Smith");
+                event.toolTip.add(lore);
+            }
+            if (event.itemStack.getTagCompound().getInteger("BonusDamage") != 0) {
+                String lore = StatCollector.translateToLocal("tooltip.damage") + " " + event.itemStack.getTagCompound().getInteger("BonusDamage");
+                event.toolTip.add(lore);
+            }
+            if (event.itemStack.getTagCompound().getInteger("BonusCrit") != 0) {
+                String lore = StatCollector.translateToLocal("tooltip.crit") + " " + event.itemStack.getTagCompound().getInteger("BonusCrit") + "%";
+                event.toolTip.add(lore);
             }
         }
     }
 
     @SubscribeEvent
     public void onAnvilUpdate(AnvilRepairEvent event) {
-//        if(e.crafting.getItem().equals(Tools.RubyAxe)){
-//            e.player.addStat(Achievements.achievementRubyAxe, 1);
-//        }
-        System.out.println(event.right);
-        System.out.println(event.right.getTagCompound());
-        writeSmithInfo(event.right, event.entityPlayer);
+        byte playerClass = PlayerExtendedProperties.getPlayerClass(event.entityPlayer);
+        if (playerClass == 3) {
+            writeItemInfo(event.right, event.entityPlayer, "smith");
+            if (Math.random() <= 0.15) {
+                writeItemInfo(event.right, event.entityPlayer, "damage");
+            }
+            if (Math.random() <= 0.15) {
+                writeItemInfo(event.right, event.entityPlayer, "crit");
+            }
+        }
     }
 
-    public static void writeSmithInfo(ItemStack craftedItem, EntityPlayer player) {
+    public static void writeItemInfo(ItemStack craftedItem, EntityPlayer player, String type) {
         NBTTagCompound tagCompound = craftedItem.getTagCompound();
         if (tagCompound == null)
             tagCompound = new NBTTagCompound();
         craftedItem.setTagCompound(tagCompound);
-        tagCompound.setString("Smith", player.getDisplayName());
+        if (type.equals("smith"))
+            tagCompound.setString("Smith", player.getDisplayName());
+        if (type.equals("damage"))
+            tagCompound.setInteger("BonusDamage", 1);
+        if (type.equals("crit"))
+            tagCompound.setInteger("BonusCrit", 15);
         craftedItem.setTagCompound(tagCompound);
         System.out.println(craftedItem);
         System.out.println(tagCompound);

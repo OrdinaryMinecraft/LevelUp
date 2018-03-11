@@ -8,6 +8,7 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -71,6 +72,7 @@ public final class FightEventHandler {
 
                 //Swords skill
                 //Archery skill
+                ItemStack weapon = entityplayer.getHeldItem();
 	            if (LevelUp.debugMode) entityplayer.addChatComponentMessage(new ChatComponentTranslation("Damage without mod " + String.valueOf(i)));
 	            if (damagesource instanceof EntityDamageSourceIndirect) {
 	                if (damagesource.damageType.equals("arrow")) {
@@ -95,6 +97,18 @@ public final class FightEventHandler {
 	                    entityplayer.addChatComponentMessage(new ChatComponentTranslation("sneak.attack", 2));
 	                }
 	            }
+
+                //Smith damage bonus
+                if (weapon.getTagCompound().getInteger("BonusDamage") != 0) {
+                    i = i + weapon.getTagCompound().getInteger("BonusDamage");
+                }
+                //Smith crit bonus
+                if (weapon.getTagCompound().getInteger("BonusCrit") != 0)
+                    if (Math.random() < (float) weapon.getTagCompound().getInteger("BonusCrit")/100) {
+                        i = i * 1.5F;
+                        entityplayer.addChatComponentMessage(new ChatComponentTranslation("critical.attack", 1.5));
+                    }
+
 	            if (LevelUp.debugMode) entityplayer.addChatComponentMessage(new ChatComponentTranslation("Damage with mod " + String.valueOf(i)));
 	        }
 	        /*
