@@ -346,12 +346,12 @@ public final class PlayerEventHandler {
         if (!event.entityPlayer.worldObj.isRemote) {
             byte playerClass = PlayerExtendedProperties.getPlayerClass(event.entityPlayer);
             if (playerClass == 3) {
-                writeItemInfo(event.output, event.entityPlayer, "smith");
+                writeItemInfo(event.right, event.entityPlayer, "smith");
                 if (Math.random() <= 0.15) {
-                    writeItemInfo(event.output, event.entityPlayer, "damage");
+                    writeItemInfo(event.right, event.entityPlayer, "damage");
                 }
                 if (Math.random() <= 0.15) {
-                    writeItemInfo(event.output, event.entityPlayer, "crit");
+                    writeItemInfo(event.right, event.entityPlayer, "crit");
                 }
             }
         }
