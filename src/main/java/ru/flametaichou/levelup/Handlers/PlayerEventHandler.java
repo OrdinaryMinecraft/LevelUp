@@ -16,10 +16,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.ContainerPlayer;
 import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemPickaxe;
-import net.minecraft.item.ItemSpade;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentTranslation;
@@ -346,22 +343,32 @@ public final class PlayerEventHandler {
         if (!event.entityPlayer.worldObj.isRemote) {
             byte playerClass = PlayerExtendedProperties.getPlayerClass(event.entityPlayer);
             if (playerClass == 3) {
-                writeItemInfo(event.right, event.entityPlayer, "smith");
-                if (Math.random() <= 0.15) {
-                    writeItemInfo(event.right, event.entityPlayer, "damage");
-                }
-                if (Math.random() <= 0.15) {
-                    writeItemInfo(event.right, event.entityPlayer, "crit");
+                if (event.right.getItem().isItemTool(event.right)) {
+                    writeItemInfo(event.right, event.entityPlayer, "smith");
+                    System.out.print("Item");
+
+                    if (event.right.getItem() instanceof ItemArmor) {
+                        //Armor
+                    } else if (event.right.getItem() instanceof ItemTool) {
+                        //Tools
+                    } else {
+                        //Swords, Bows, etc
+                        if (Math.random() <= 0.15) {
+                            writeItemInfo(event.right, event.entityPlayer, "damage");
+                        }
+
+                        if (Math.random() <= 0.15) {
+                            writeItemInfo(event.right, event.entityPlayer, "crit");
+                        }
+                    }
                 }
             }
         }
     }
 
     public static void writeItemInfo(ItemStack craftedItem, EntityPlayer player, String type) {
-
         ItemStack item = craftedItem;
-        for (ItemStack s : player.inventory.mainInventory)
-        {
+        for (ItemStack s : player.inventory.mainInventory) {
             if (s != null && s.getItem() == craftedItem.getItem() && s.getTagCompound() != null && s.getTagCompound().equals(craftedItem.getTagCompound())) {
                 item = s;
             }
@@ -379,7 +386,6 @@ public final class PlayerEventHandler {
             else if (type.equals("crit"))
                 tagCompound.setInteger("BonusCrit", 15);
             item.setTagCompound(tagCompound);
-            System.out.println(item + " " + type + " " + tagCompound);
         }
     }
 
