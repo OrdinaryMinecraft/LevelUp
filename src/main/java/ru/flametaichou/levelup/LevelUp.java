@@ -118,7 +118,6 @@ public final class LevelUp {
         }
 
         FMLCommonHandler.instance().bus().register(FMLEventHandler.INSTANCE);
-        FMLCommonHandler.instance().bus().register(PlayerEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(new PlayerEventHandler());
         MinecraftForge.EVENT_BUS.register(new MobEventHandler());
     }

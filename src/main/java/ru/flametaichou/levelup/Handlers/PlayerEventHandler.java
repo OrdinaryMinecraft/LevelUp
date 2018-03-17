@@ -70,8 +70,6 @@ public final class PlayerEventHandler {
     /**
      * Internal ore counter
      */
-    public static final PlayerEventHandler INSTANCE = new PlayerEventHandler();
-
     private static Map<Block, Integer> blockToCounter = new IdentityHashMap<Block, Integer>();
 
     static {
@@ -345,32 +343,44 @@ public final class PlayerEventHandler {
 
     @SubscribeEvent
     public void onAnvilUpdate(AnvilRepairEvent event) {
-        byte playerClass = PlayerExtendedProperties.getPlayerClass(event.entityPlayer);
-        if (playerClass == 3) {
-            writeItemInfo(event.right, event.entityPlayer, "smith");
-            if (Math.random() <= 0.15) {
-                writeItemInfo(event.right, event.entityPlayer, "damage");
-            }
-            if (Math.random() <= 0.15) {
-                writeItemInfo(event.right, event.entityPlayer, "crit");
+        if (!event.entityPlayer.worldObj.isRemote) {
+            byte playerClass = PlayerExtendedProperties.getPlayerClass(event.entityPlayer);
+            if (playerClass == 3) {
+                writeItemInfo(event.output, event.entityPlayer, "smith");
+                if (Math.random() <= 0.15) {
+                    writeItemInfo(event.output, event.entityPlayer, "damage");
+                }
+                if (Math.random() <= 0.15) {
+                    writeItemInfo(event.output, event.entityPlayer, "crit");
+                }
             }
         }
     }
 
     public static void writeItemInfo(ItemStack craftedItem, EntityPlayer player, String type) {
-        NBTTagCompound tagCompound = craftedItem.getTagCompound();
-        if (tagCompound == null)
-            tagCompound = new NBTTagCompound();
-        craftedItem.setTagCompound(tagCompound);
-        if (type.equals("smith"))
-            tagCompound.setString("Smith", player.getDisplayName());
-        if (type.equals("damage"))
-            tagCompound.setInteger("BonusDamage", 1);
-        if (type.equals("crit"))
-            tagCompound.setInteger("BonusCrit", 15);
-        craftedItem.setTagCompound(tagCompound);
-        System.out.println(craftedItem);
-        System.out.println(tagCompound);
+
+        ItemStack item = craftedItem;
+        for (ItemStack s : player.inventory.mainInventory)
+        {
+            if (s != null && s.getItem() == craftedItem.getItem() && s.getTagCompound() != null && s.getTagCompound().equals(craftedItem.getTagCompound())) {
+                item = s;
+            }
+        }
+
+        if (item != null) {
+            NBTTagCompound tagCompound = item.getTagCompound();
+            if (tagCompound == null)
+                tagCompound = new NBTTagCompound();
+            item.setTagCompound(tagCompound);
+            if (type.equals("smith"))
+                tagCompound.setString("Smith", player.getDisplayName());
+            else if (type.equals("damage"))
+                tagCompound.setInteger("BonusDamage", 1);
+            else if (type.equals("crit"))
+                tagCompound.setInteger("BonusCrit", 15);
+            item.setTagCompound(tagCompound);
+            System.out.println(item + " " + type + " " + tagCompound);
+        }
     }
 
     /**
