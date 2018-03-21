@@ -50,9 +50,9 @@ skill10.tooltip2=Every 5: + chance: 2x wheat drops
 skill11.name=Fishing
 skill11.tooltip1=Every 1: + chance getting a bite
 skill11.tooltip2=Every 5: + chance fish up rare loot
-skill12.name=Digging
-skill12.tooltip1=Every 1: + chance: digging up loot
-skill12.tooltip2=Every 5: + chance: flint from gravel
+skill12.name=Blacksmithing
+skill12.tooltip1=Every 1: + chance: additional effect on item
+skill12.tooltip2=Every 5: + return xp volume
 
 gui.class.title=Your Class: %s
 

@@ -341,26 +341,33 @@ public final class PlayerEventHandler {
     @SubscribeEvent
     public void onAnvilUpdate(AnvilRepairEvent event) {
         if (!event.entityPlayer.worldObj.isRemote) {
+            //Blacksmithing skill
+            //Smith class bonus
             byte playerClass = PlayerExtendedProperties.getPlayerClass(event.entityPlayer);
-            if (playerClass == 3) {
+            if (getSkill(event.entityPlayer, 12) > 0) {
                 if (event.right.getItem().isItemTool(event.right)) {
-                    writeItemInfo(event.right, event.entityPlayer, "smith");
-                    System.out.print("Item");
-
+                    if (playerClass == 3) writeItemInfo(event.right, event.entityPlayer, "smith");
                     if (event.right.getItem() instanceof ItemArmor) {
                         //Armor
                     } else if (event.right.getItem() instanceof ItemTool) {
                         //Tools
                     } else {
                         //Swords, Bows, etc
-                        if (Math.random() <= 0.15) {
+                        if (Math.random() <= getSkill(event.entityPlayer, 11) / 100D) {
                             writeItemInfo(event.right, event.entityPlayer, "damage");
                         }
 
-                        if (Math.random() <= 0.15) {
+                        if (Math.random() <= getSkill(event.entityPlayer, 11) / 100D) {
                             writeItemInfo(event.right, event.entityPlayer, "crit");
                         }
                     }
+                }
+
+                //Возвращаем часть опыта
+                //if (Math.random() > 0.25) {
+                if (true) {
+                    System.out.println(event.entityPlayer.experienceLevel);
+                    event.entityPlayer.addExperience(event.output.getRepairCost());
                 }
             }
         }
