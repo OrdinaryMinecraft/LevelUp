@@ -68,6 +68,10 @@ public final class SkillPacketHandler {
             entityPlayerMP.worldObj.playSoundEffect(entityPlayerMP.posX, entityPlayerMP.posY, entityPlayerMP.posZ, "mob.irongolem.throw", 1.0F, 0.5F);
             entityPlayerMP.addPotionEffect(new PotionEffect(Potion.moveSpeed.id, 20, 9, true));
             entityPlayerMP.addPotionEffect(new PotionEffect(Potion.damageBoost.id, 20, 1, true));
+        } else if (packetString.contains("addExp")) {
+            String[] parts = packetString.split("/");
+            entityPlayerMP.addExperienceLevel(Integer.parseInt(parts[1]));
+            entityPlayerMP.worldObj.playSoundEffect(entityPlayerMP.posX, entityPlayerMP.posY, entityPlayerMP.posZ, "random.levelup", 1.5F, 1.5F);
         }
     }
 

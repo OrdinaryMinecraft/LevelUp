@@ -16,6 +16,7 @@ key.keys.skill=Use Class Skill
 key.message.cooldown=Skill cooldown: %d
 miner.ores.none=No ores here!
 miner.ores.ore=The nearest ore is located:
+blacksmith.xp.return=%d exp level was returned to you
 
 skill1.name=Mining
 skill1.tooltip1=Every 1: + chance: 2x ore drops, + chance find treasure while digging

@@ -98,17 +98,19 @@ public final class FightEventHandler {
 	                }
 	            }
 
-                //Smith damage bonus
-                if (weapon.getTagCompound().getInteger("BonusDamage") != 0) {
-                    i = i + weapon.getTagCompound().getInteger("BonusDamage");
-                }
-                //Smith crit bonus
-                if (weapon.getTagCompound().getInteger("BonusCrit") != 0)
-                    if (Math.random() < (float) weapon.getTagCompound().getInteger("BonusCrit")/100) {
-                        i = i * 1.5F;
-                        entityplayer.addChatComponentMessage(new ChatComponentTranslation("critical.attack", 1.5));
-                    }
 
+                if (weapon.getTagCompound() != null) {
+                    //Smith damage bonus
+                    if (weapon.getTagCompound().getInteger("BonusDamage") != 0) {
+                        i = i + weapon.getTagCompound().getInteger("BonusDamage");
+                    }
+                    //Smith crit bonus
+                    if (weapon.getTagCompound().getInteger("BonusCrit") != 0)
+                        if (Math.random() < (float) weapon.getTagCompound().getInteger("BonusCrit") / 100) {
+                            i = i * 1.5F;
+                            entityplayer.addChatComponentMessage(new ChatComponentTranslation("critical.attack", 1.5));
+                        }
+                }
 	            if (LevelUp.debugMode) entityplayer.addChatComponentMessage(new ChatComponentTranslation("Damage with mod " + String.valueOf(i)));
 	        }
 	        /*

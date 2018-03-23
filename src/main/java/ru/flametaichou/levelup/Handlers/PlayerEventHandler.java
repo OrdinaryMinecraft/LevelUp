@@ -5,6 +5,8 @@ import com.google.common.collect.Sets;
 import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import cpw.mods.fml.relauncher.Side;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.EntityItem;
@@ -141,6 +143,14 @@ public final class PlayerEventHandler {
      */
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onInteract(PlayerInteractEvent event) {
+        if (event.action == Action.RIGHT_CLICK_BLOCK) {
+            Block block = event.world.getBlock(event.x,event.y,event.z);
+            // Сохраняем данные для Кузнечного дела
+            if (block == Blocks.anvil && event.world.isRemote) {
+                PlayerExtendedProperties.from(event.entityPlayer).saveLatestExp(event.entityPlayer.experienceLevel);
+            }
+        }
+
         if (event.useItem != Event.Result.DENY)
             /*
             * Fishing skill
@@ -339,12 +349,13 @@ public final class PlayerEventHandler {
     }
 
     @SubscribeEvent
-    public void onAnvilUpdate(AnvilRepairEvent event) {
+    public void onAnvilRepair(AnvilRepairEvent event) {
+
         if (!event.entityPlayer.worldObj.isRemote) {
             //Blacksmithing skill
             //Smith class bonus
             byte playerClass = PlayerExtendedProperties.getPlayerClass(event.entityPlayer);
-            if (getSkill(event.entityPlayer, 12) > 0) {
+            if (getSkill(event.entityPlayer, 11) > 0) {
                 if (event.right.getItem().isItemTool(event.right)) {
                     if (playerClass == 3) writeItemInfo(event.right, event.entityPlayer, "smith");
                     if (event.right.getItem() instanceof ItemArmor) {
@@ -362,14 +373,22 @@ public final class PlayerEventHandler {
                         }
                     }
                 }
-
-                //Возвращаем часть опыта
-                //if (Math.random() > 0.25) {
-                if (true) {
-                    System.out.println(event.entityPlayer.experienceLevel);
-                    event.entityPlayer.addExperience(event.output.getRepairCost());
-                }
             }
+        } else {
+
+            //Возвращаем часть опыта
+            //if (Math.random() < 0.25) {
+            if (true) {
+                int lvlDiff = PlayerExtendedProperties.from(event.entityPlayer).loadLatestExp() - event.entityPlayer.experienceLevel;
+                int multiplier = getSkill(event.entityPlayer, 11)/5*5;
+                int returnedExp = lvlDiff/100*multiplier;
+                if (lvlDiff >= 6 && returnedExp < 1)
+                    returnedExp = 1;
+                FMLProxyPacket packet = SkillPacketHandler.getOtherPacket(Side.SERVER, "addExp/"+returnedExp);
+                LevelUp.otherChannel.sendToServer(packet);
+                event.entityPlayer.addChatComponentMessage(new ChatComponentTranslation("blacksmith.xp.return", returnedExp));
+            }
+            PlayerExtendedProperties.from(event.entityPlayer).saveLatestExp(event.entityPlayer.experienceLevel);
         }
     }
 

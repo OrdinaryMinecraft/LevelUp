@@ -15,6 +15,7 @@ key.keys.skill=Актив. способность
 key.message.cooldown=Способность перезаряжается: %d
 miner.ores.none=Руд поблизости нет!
 miner.ores.ore=Ближайшая руда находится по координатам:
+blacksmith.xp.return=Вам был возвращен %d уровень
 
 skill1.name=Добыча
 skill1.tooltip1=Каждый 1: + шанс: 2x выпадение руды, + шанс найти сокровище при копании

@@ -21,6 +21,7 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
     private long lastSkillActivation;
     private int doubleShotCount;
     private int fireShotCount;
+    private int latestExp;
     private Map<String, Integer> skillMap = new HashMap<String, Integer>();
     private Map<String, int[]> counterMap = new HashMap<String, int[]>();
     public final static String[] counters = {"ore", "craft", "bonus"};
@@ -137,6 +138,7 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
 
     /*
      * Количество огненных выстрелов для лучника
+     * Работает только на стороне клиента (?)
      */
 
     public void saveFireShotCount(int fsc) {
@@ -145,6 +147,19 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
 
     public int loadFireShotCount() {
         return fireShotCount;
+    }
+
+    /*
+     * Сохраненное количество опыта для кузнечного дела
+     * Работает только на стороне клиента
+     */
+
+    public void saveLatestExp(int exp) {
+        latestExp = exp;
+    }
+
+    public int loadLatestExp() {
+        return latestExp;
     }
 
     @Override
