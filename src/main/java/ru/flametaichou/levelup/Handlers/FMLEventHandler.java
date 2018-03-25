@@ -18,16 +18,14 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityFishHook;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemDye;
-import net.minecraft.item.ItemHoe;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
@@ -243,16 +241,26 @@ public final class FMLEventHandler {
     @SubscribeEvent
     public void onSmelting(PlayerEvent.ItemSmeltedEvent event) {
     	LevelUp.takenFromSmelting(event.player, event.smelting);
-        /* if (!event.player.worldObj.isRemote) {
+        byte playerClass = PlayerExtendedProperties.getPlayerClass(event.player);
+        // Farmer class bonus
+    	// Smith class bonus
+    	if (!event.player.worldObj.isRemote) {
             Random random = event.player.getRNG();
             ItemStack add = null;
             if (event.smelting.getItemUseAction() == EnumAction.eat) {
-                if (random.nextFloat() <= getSkill(event.player, 7) / 200F) {
-                    add = event.smelting.copy();
-                    System.out.println("test");
+                if (playerClass == 6) {
+                    if (Math.random() <= 0.15) {
+                        add = event.smelting.copy();
+                    }
                 }
-            } else if (random.nextFloat() <= getSkill(event.player, 4) / 200F) {
-                add = event.smelting.copy();
+//                if (random.nextFloat() <= getSkill(event.player, 7) / 200F) {
+//                    add = event.smelting.copy();
+//                    System.out.println("test");
+//                }
+            } else if (playerClass == 3) {
+                if (Math.random() <= 0.15) {
+                    add = event.smelting.copy();
+                }
             }
             EntityItem entityitem = ForgeHooks.onPlayerTossEvent(event.player, add, true);
             if (entityitem != null) {
@@ -260,7 +268,6 @@ public final class FMLEventHandler {
                 entityitem.func_145797_a(event.player.getCommandSenderName());
             }
         }
-        */
     }
 
     /**

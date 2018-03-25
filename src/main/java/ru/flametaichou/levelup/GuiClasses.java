@@ -33,10 +33,12 @@ public final class GuiClasses extends GuiScreen {
         buttonList.add(new GuiButton(100, width / 2 - 192, height / 6 + 168, 96, 20, StatCollector.translateToLocal("gui.cancel")));
         for (int j = 1; j < 13; j = j + 3) {
             for (int i = 0; i < 3; i++) {
-                buttonList.add(new GuiButton(i + j, width / 2 - 160 + i * 112, 18 + 32 * (j - 1) / 3, 96, 20, StatCollector.translateToLocal("class" + (i + j) + ".name")));
+                GuiButton button = new GuiButton(i + j, width / 2 - 160 + i * 112, 18 + 32 * (j - 1) / 3, 96, 20, StatCollector.translateToLocal("class" + (i + j) + ".name"));
+                if (i + j == 4) button.enabled = false;
+                buttonList.add(button);
             }
         }
-        buttonList.add(new GuiButton(13, width / 2 - 48, 146, 96, 20, StatCollector.translateToLocal("class13.name")));
+        // buttonList.add(new GuiButton(13, width / 2 - 48, 146, 96, 20, StatCollector.translateToLocal("class13.name")));
     }
 
     @Override

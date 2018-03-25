@@ -70,17 +70,17 @@ public final class ClassBonus {
         NONE(-1, -1, -1),
         MINER(0, 11, 2),
         SWORDSMAN(1, 2, 6),
-        SMITH(0, 1, 2),
+        SMITH(11, 0, 2),
         ARCHAEOLOGIST(11, 4, 0),
         MARKSMAN(5, 8, 6),
-        FARMER(9, 11, 3),
+        FARMER(9, 10, 3),
         LUMBERJACK(3, 2, 6),
         HUNTER(4, 1, 5),
         FISHERMAN(10, 7, 3),
         TRAVELLER(6, 7, 8),
         THIEF(4, 8, 6),
-        SENTINEL(2, 1, 5),
-        FREELANCE(12, 12, 12);
+        SENTINEL(2, 1, 5);
+        // FREELANCE(12, 12, 12);
         private final int main, sec1, sec2;
 
         private CLASSES(int main, int sec1, int sec2) {

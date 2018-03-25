@@ -205,6 +205,7 @@ public final class LevelUp {
         }
     }
 
+    // Smith class bonus
     public static void giveBonusSmeltingXP(EntityPlayer player) {
 	    if (bonusSmeltingXP) {
 	        byte pClass = PlayerExtendedProperties.getPlayerClass(player);
@@ -242,7 +243,8 @@ public final class LevelUp {
     public static void giveBonusRandomXP(EntityPlayer player) {
     if (bonusRandomXP) {
         byte pClass = PlayerExtendedProperties.getPlayerClass(player);
-        if (pClass == 13 || pClass == 10) {
+        // Traveller class bonus
+        if (pClass == 10) {
             player.addExperience(1);
        		}
     	}

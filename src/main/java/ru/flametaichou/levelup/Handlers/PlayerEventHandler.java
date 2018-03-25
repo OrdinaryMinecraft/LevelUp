@@ -357,7 +357,8 @@ public final class PlayerEventHandler {
             byte playerClass = PlayerExtendedProperties.getPlayerClass(event.entityPlayer);
             if (getSkill(event.entityPlayer, 11) > 0) {
                 if (event.right.getItem().isItemTool(event.right)) {
-                    if (playerClass == 3) writeItemInfo(event.right, event.entityPlayer, "smith");
+                    int amount = 0;
+                    if (playerClass == 3) writeItemInfo(event.right, event.entityPlayer, "smith", amount);
                     if (event.right.getItem() instanceof ItemArmor) {
                         //Armor
                     } else if (event.right.getItem() instanceof ItemTool) {
@@ -365,11 +366,19 @@ public final class PlayerEventHandler {
                     } else {
                         //Swords, Bows, etc
                         if (Math.random() <= getSkill(event.entityPlayer, 11) / 100D) {
-                            writeItemInfo(event.right, event.entityPlayer, "damage");
+                            if (playerClass == 3)
+                                amount = 2;
+                            else
+                                amount = 1;
+                            writeItemInfo(event.right, event.entityPlayer, "damage", amount);
                         }
 
                         if (Math.random() <= getSkill(event.entityPlayer, 11) / 100D) {
-                            writeItemInfo(event.right, event.entityPlayer, "crit");
+                            if (playerClass == 3)
+                                amount = 20;
+                            else
+                                amount = 15;
+                            writeItemInfo(event.right, event.entityPlayer, "crit", amount);
                         }
                     }
                 }
@@ -392,7 +401,7 @@ public final class PlayerEventHandler {
         }
     }
 
-    public static void writeItemInfo(ItemStack craftedItem, EntityPlayer player, String type) {
+    public static void writeItemInfo(ItemStack craftedItem, EntityPlayer player, String type, int amount) {
         ItemStack item = craftedItem;
         for (ItemStack s : player.inventory.mainInventory) {
             if (s != null && s.getItem() == craftedItem.getItem() && s.getTagCompound() != null && s.getTagCompound().equals(craftedItem.getTagCompound())) {
@@ -408,9 +417,9 @@ public final class PlayerEventHandler {
             if (type.equals("smith"))
                 tagCompound.setString("Smith", player.getDisplayName());
             else if (type.equals("damage"))
-                tagCompound.setInteger("BonusDamage", 1);
+                tagCompound.setInteger("BonusDamage", amount);
             else if (type.equals("crit"))
-                tagCompound.setInteger("BonusCrit", 15);
+                tagCompound.setInteger("BonusCrit", amount);
             item.setTagCompound(tagCompound);
         }
     }
