@@ -107,9 +107,10 @@ public final class PlayerEventHandler {
             }
         if (event.block instanceof BlockStone || event.block == Blocks.cobblestone || event.block == Blocks.obsidian || (event.block instanceof BlockOre)) {
             event.newSpeed = event.newSpeed + getSkill(event.entityPlayer, 0) / 5 * 0.2F;
-        } else if (event.block.getMaterial() == Material.wood) {
-            event.newSpeed = event.newSpeed + getSkill(event.entityPlayer, 3) / 5 * 0.2F;
         }
+//        else if (event.block.getMaterial() == Material.wood) {
+//            event.newSpeed = event.newSpeed + getSkill(event.entityPlayer, 3) / 5 * 0.2F;
+//        }
     }
     
     /**
@@ -157,12 +158,12 @@ public final class PlayerEventHandler {
             */
             if (event.action == Action.RIGHT_CLICK_AIR) {
                 EntityFishHook hook = event.entityPlayer.fishEntity;
-                //Происходит при вытаскивании удочки
+                // Происходит при вытаскивании удочки
                 if (hook != null && hook.field_146043_c == null) {
                     int loot = getBonusFishingLoot(event.entityPlayer);
                     Random random = new Random();
                     if (!hook.worldObj.isRemote) {
-                        //Проверяем "победу". Гениально!
+                        // Проверяем "победу". Гениально!
                         if (hook.isSneaking()) {
                             EntityItem entityitem = new EntityItem(hook.worldObj, hook.posX, hook.posY, hook.posZ, FishingHooks.getRandomFishable(random,1));
                             double d1 = hook.field_146042_b.posX - hook.posX;
@@ -175,9 +176,9 @@ public final class PlayerEventHandler {
                             entityitem.motionZ = d5 * d9;
                             hook.worldObj.spawnEntityInWorld(entityitem);
 
-                            //Здесь добавляем к пойманному луту бонусный
+                            // Здесь добавляем к пойманному луту бонусный
                             EntityItem bonusLoot = null;
-                            if (loot >=0)
+                            if (loot >= 0)
                                 bonusLoot = new EntityItem(hook.worldObj, hook.posX, hook.posY, hook.posZ, new ItemStack (Item.getItemById(Integer.parseInt(bonusFishingLootList.get(loot)))));
                             if (bonusLoot != null) {
                                 bonusLoot.motionX = d1 * d9;
@@ -187,7 +188,7 @@ public final class PlayerEventHandler {
                                 event.entityPlayer.addChatComponentMessage(new ChatComponentTranslation("rare.fish"));
                             }
 
-                            //Здесь добавляем к пойманному луту сундук с сокровищами, если класс игрока - рыбак
+                            // Здесь добавляем к пойманному луту сундук с сокровищами, если класс игрока - рыбак
                             bonusLoot = null;
                             byte pClass = PlayerExtendedProperties.getPlayerClass(event.entityPlayer);
                             if (pClass == 9) {
@@ -269,22 +270,6 @@ public final class PlayerEventHandler {
                         }
                     }
                 }
-            } else if (event.block instanceof BlockLog) {
-                skill = getSkill(event.harvester, 3);
-                if (random.nextDouble() <= skill / 150D) {
-                    ItemStack planks = null;
-                    for (ItemStack stack : event.drops) {
-                        if (stack != null && event.block == Block.getBlockFromItem(stack.getItem())) {
-                            planks = getPlanks(event.harvester, event.block, event.blockMetadata, stack.copy());
-                            break;
-                        }
-                    }
-                    if (planks != null)
-                        event.drops.add(planks);
-                }
-                if (random.nextDouble() <= skill / 150D) {
-                    event.drops.add(new ItemStack(Items.stick, 2));
-                }
             } else if (event.block.getMaterial() == Material.ground) {
                 skill = getSkill(event.harvester, 0);
                 if (random.nextFloat() <= skill / 200F) {
@@ -332,7 +317,6 @@ public final class PlayerEventHandler {
     @SubscribeEvent
     public void onTooltipItem(ItemTooltipEvent event) {
         if (event.itemStack.getTagCompound() != null) {
-            //System.out.println(event.itemStack.getTagCompound());
             if (event.itemStack.getTagCompound().getString("Smith") != "") {
                 String lore = StatCollector.translateToLocal("tooltip.smith") + " " + event.itemStack.getTagCompound().getString("Smith");
                 event.toolTip.add(lore);
@@ -351,10 +335,10 @@ public final class PlayerEventHandler {
     @SubscribeEvent
     public void onAnvilRepair(AnvilRepairEvent event) {
 
+        byte playerClass = PlayerExtendedProperties.getPlayerClass(event.entityPlayer);
         if (!event.entityPlayer.worldObj.isRemote) {
-            //Blacksmithing skill
-            //Smith class bonus
-            byte playerClass = PlayerExtendedProperties.getPlayerClass(event.entityPlayer);
+            // Blacksmithing skill
+            // Smith class bonus
             if (getSkill(event.entityPlayer, 11) > 0) {
                 if (event.right.getItem().isItemTool(event.right)) {
                     int amount = 0;
@@ -384,18 +368,18 @@ public final class PlayerEventHandler {
                 }
             }
         } else {
-
-            //Возвращаем часть опыта
-            //if (Math.random() < 0.25) {
-            if (true) {
-                int lvlDiff = PlayerExtendedProperties.from(event.entityPlayer).loadLatestExp() - event.entityPlayer.experienceLevel;
-                int multiplier = getSkill(event.entityPlayer, 11)/5*5;
-                int returnedExp = lvlDiff/100*multiplier;
-                if (lvlDiff >= 6 && returnedExp < 1)
-                    returnedExp = 1;
-                FMLProxyPacket packet = SkillPacketHandler.getOtherPacket(Side.SERVER, "addExp/"+returnedExp);
-                LevelUp.otherChannel.sendToServer(packet);
-                event.entityPlayer.addChatComponentMessage(new ChatComponentTranslation("blacksmith.xp.return", returnedExp));
+            if (getSkill(event.entityPlayer, 11) >= 5) {
+                // Возвращаем часть опыта
+                if (Math.random() < 0.25) {
+                    int lvlDiff = PlayerExtendedProperties.from(event.entityPlayer).loadLatestExp() - event.entityPlayer.experienceLevel;
+                    int multiplier = getSkill(event.entityPlayer, 11) / 5 * 5;
+                    int returnedExp = lvlDiff / 100 * multiplier;
+                    if (lvlDiff >= 6 && returnedExp < 1)
+                        returnedExp = 1;
+                    FMLProxyPacket packet = SkillPacketHandler.getOtherPacket(Side.SERVER, "addExp/" + returnedExp);
+                    LevelUp.otherChannel.sendToServer(packet);
+                    event.entityPlayer.addChatComponentMessage(new ChatComponentTranslation("blacksmith.xp.return", returnedExp));
+                }
             }
             PlayerExtendedProperties.from(event.entityPlayer).saveLatestExp(event.entityPlayer.experienceLevel);
         }

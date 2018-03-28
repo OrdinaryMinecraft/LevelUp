@@ -7,6 +7,7 @@ import java.util.Random;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityMob;
+import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -24,7 +25,7 @@ public class MobEventHandler {
 	@SubscribeEvent
     public void onMobDrops(LivingDropsEvent event)
     {
-		//Фикс дублирования дропа с мобов из-за костыльного нанесения урона @FightEventHandler.onHurting
+		// Фикс дублирования дропа с мобов из-за костыльного нанесения урона @FightEventHandler.onHurting
 		if (event.entityLiving.getHealth() == -1) {
 			event.entityLiving.setHealth(0);
 			event.drops.set(0, null);
@@ -37,7 +38,7 @@ public class MobEventHandler {
 				EntityPlayer player = (EntityPlayer) event.source.getSourceOfDamage();
 				int bonus = getSkill(player, 4);
 
-				//Добавляю бонусный лут в дроп
+				// Добавляю бонусный лут в дроп
 				if (event.entity instanceof EntityMob && bonus > 0) {
 					double d = Math.random() * 100;
 					if (d < bonus) {
@@ -57,13 +58,21 @@ public class MobEventHandler {
 					}
 				}
 
-				//Удваиваем дроп. Только если моб - не из мода CustomNPCs
+				// Удваиваем дроп. Только если моб - не из мода CustomNPCs
 				if (event.entity instanceof EntityMob && !event.entity.getClass().getName().contains("custom") && bonus / 5 > 0) {
 					double d = Math.random() * 100;
 					if (d < bonus / 5 * 5) {
 						event.drops.clone();
 					}
 				}
+
+				// Hunter class bonus
+                byte pClass = PlayerExtendedProperties.getPlayerClass(player);
+                if (event.entity instanceof EntityAnimal && pClass == 8) {
+                    if (Math.random() < 0.15) {
+                        event.drops.clone();
+                    }
+                }
 			}
 		}
     }	

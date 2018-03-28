@@ -34,7 +34,7 @@ public final class GuiClasses extends GuiScreen {
         for (int j = 1; j < 13; j = j + 3) {
             for (int i = 0; i < 3; i++) {
                 GuiButton button = new GuiButton(i + j, width / 2 - 160 + i * 112, 18 + 32 * (j - 1) / 3, 96, 20, StatCollector.translateToLocal("class" + (i + j) + ".name"));
-                if (i + j == 4) button.enabled = false;
+                if (i + j == 4 || i + j == 6 || i + j == 7) button.enabled = false;
                 buttonList.add(button);
             }
         }

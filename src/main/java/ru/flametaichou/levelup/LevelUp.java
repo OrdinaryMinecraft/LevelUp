@@ -215,6 +215,7 @@ public final class LevelUp {
 	    }
     }
 
+    // Hunter class bonus
     public static void giveBonusFightingXP(EntityPlayer player) {
         if (bonusFightingXP) {
             byte pClass = PlayerExtendedProperties.getPlayerClass(player);
@@ -224,6 +225,7 @@ public final class LevelUp {
         }
     }
 
+    // Peasant class bonus
     public static void giveBonusFishingXP(EntityPlayer player) {
         byte pClass = PlayerExtendedProperties.getPlayerClass(player);
         if (pClass == 9) {
@@ -231,6 +233,7 @@ public final class LevelUp {
         }
     }
 
+    // Miner class bonus
     public static void giveBonusMiningXP(EntityPlayer player) {
         if (bonusMiningXP) {
             byte pClass = PlayerExtendedProperties.getPlayerClass(player);

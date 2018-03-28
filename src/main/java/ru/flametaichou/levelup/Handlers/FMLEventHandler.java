@@ -32,6 +32,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import ru.flametaichou.levelup.ClassBonus;
 import ru.flametaichou.levelup.LevelUp;
 import ru.flametaichou.levelup.PlayerExtendedProperties;
+import ru.flametaichou.levelup.Util.WorldUtils;
 
 public final class FMLEventHandler {
     /**
@@ -66,16 +67,23 @@ public final class FMLEventHandler {
         if (event.phase == TickEvent.Phase.START) {
             EntityPlayer player = event.player;
 
-            //clear effects
+            // Clear effects
             if (PlayerExtendedProperties.from(player).loadEffectData()) {
                 removeEffects(player);
                 PlayerExtendedProperties.from(player).sendEffectData(false);
             }
 
-            //mining bonus for Miner class
-            if (player.worldObj.getWorldTime() % 50 == 0)
-            if (player.posY < 50 && PlayerExtendedProperties.getPlayerClass(player) == 1) {
-                player.addPotionEffect(new PotionEffect(Potion.digSpeed.id, 80, 0, true));
+            if (player.worldObj.getWorldTime() % 50 == 0) {
+                // Miner class bonus
+                if (player.posY < 50 && PlayerExtendedProperties.getPlayerClass(player) == 1) {
+                    player.addPotionEffect(new PotionEffect(Potion.digSpeed.id, 80, 0, true));
+                    System.out.println("test");
+                }
+                // Hunter class bonus
+                if (WorldUtils.isNight(event.player.worldObj) && PlayerExtendedProperties.getPlayerClass(player) == 8) {
+                    player.addPotionEffect(new PotionEffect(Potion.nightVision.id, 250, 0, true));
+                    System.out.println("test");
+                }
             }
 
             //underwater bonus
@@ -242,13 +250,13 @@ public final class FMLEventHandler {
     public void onSmelting(PlayerEvent.ItemSmeltedEvent event) {
     	LevelUp.takenFromSmelting(event.player, event.smelting);
         byte playerClass = PlayerExtendedProperties.getPlayerClass(event.player);
-        // Farmer class bonus
+        // Peasant class bonus
     	// Smith class bonus
     	if (!event.player.worldObj.isRemote) {
             Random random = event.player.getRNG();
             ItemStack add = null;
             if (event.smelting.getItemUseAction() == EnumAction.eat) {
-                if (playerClass == 6) {
+                if (playerClass == 9) {
                     if (Math.random() <= 0.15) {
                         add = event.smelting.copy();
                     }
@@ -296,7 +304,7 @@ public final class FMLEventHandler {
         loadPlayer(event.player);
     }
     
-    //Increase HP
+    // Increase HP
     public void updatePlayerHP (EntityPlayer player) {
     	int skill = getSkill(player, 2);
         player.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(20 + (2 * skill / 5));

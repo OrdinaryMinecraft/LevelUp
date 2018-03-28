@@ -71,13 +71,13 @@ public final class ClassBonus {
         MINER(0, 11, 2),
         SWORDSMAN(1, 2, 6),
         SMITH(11, 0, 2),
-        ARCHAEOLOGIST(11, 4, 0),
+        IN_PROGRESS(0, 0, 0),
         MARKSMAN(5, 8, 6),
-        FARMER(9, 10, 3),
-        LUMBERJACK(3, 2, 6),
+        IN_PROGRESS2(0, 0, 0),
+        IN_PROGRESS3(0, 0, 0),
         HUNTER(4, 1, 5),
-        FISHERMAN(10, 7, 3),
-        TRAVELLER(6, 7, 8),
+        PEASANT(9, 10, 7),
+        TRAVELLER(6, 7, 2),
         THIEF(4, 8, 6),
         SENTINEL(2, 1, 5);
         // FREELANCE(12, 12, 12);
