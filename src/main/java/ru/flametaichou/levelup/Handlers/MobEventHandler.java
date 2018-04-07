@@ -13,6 +13,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import ru.flametaichou.levelup.Model.PlayerClass;
+import ru.flametaichou.levelup.Model.PlayerSkill;
 import ru.flametaichou.levelup.PlayerExtendedProperties;
 
 public class MobEventHandler {
@@ -36,7 +38,7 @@ public class MobEventHandler {
 			int count = 0;
 			if (event.source.getSourceOfDamage() instanceof EntityPlayer) {
 				EntityPlayer player = (EntityPlayer) event.source.getSourceOfDamage();
-				int bonus = getSkill(player, 4);
+				int bonus = PlayerExtendedProperties.getSkill(player, PlayerSkill.LOOTING);
 
 				// Добавляю бонусный лут в дроп
 				if (event.entity instanceof EntityMob && bonus > 0) {
@@ -67,21 +69,14 @@ public class MobEventHandler {
 				}
 
 				// Hunter class bonus
-                byte pClass = PlayerExtendedProperties.getPlayerClass(player);
-                if (event.entity instanceof EntityAnimal && pClass == 8) {
+                PlayerClass pClass = PlayerExtendedProperties.getPlayerClass(player);
+                if (event.entity instanceof EntityAnimal && pClass == PlayerClass.HUNTER) {
                     if (Math.random() < 0.15) {
                         event.drops.clone();
                     }
                 }
 			}
 		}
-    }	
-
-    /**
-     * Helper to retrieve skill points from the index
-     */
-    public static int getSkill(EntityPlayer player, int id) {
-        return PlayerExtendedProperties.getSkillFromIndex(player, id);
     }
 
 	/**

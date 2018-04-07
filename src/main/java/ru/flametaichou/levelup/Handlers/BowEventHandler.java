@@ -9,8 +9,9 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
-import ru.flametaichou.levelup.Entity.EntityBonusArrow;
 import ru.flametaichou.levelup.Entity.EntityCustomArrow;
+import ru.flametaichou.levelup.Model.PlayerClass;
+import ru.flametaichou.levelup.Model.PlayerSkill;
 import ru.flametaichou.levelup.PlayerExtendedProperties;
 
 import java.util.Random;
@@ -28,17 +29,18 @@ public final class BowEventHandler {
             if (arrow.shootingEntity instanceof EntityPlayer) {
                 EntityPlayer archer = (EntityPlayer) arrow.shootingEntity;
 
-//                //Archery skill
-//                int archerSkill = getArcherSkill(archer);
-//                if (archerSkill != 0) {
-//                    arrow.motionX *= 1.0F + archerSkill / 100F;
-//                    arrow.motionY *= 1.0F + archerSkill / 100F;
-//                    arrow.motionZ *= 1.0F + archerSkill / 100F;
-//                }
+                // Ускорение стрелы
+                //int archerSkill = getArcherSkill(archer);
+                //if (archerSkill != 0) {
+                //    arrow.motionX *= 1.0F + archerSkill / 100F;
+                //    arrow.motionY *= 1.0F + archerSkill / 100F;
+                //    arrow.motionZ *= 1.0F + archerSkill / 100F;
+                //}
 
-                if (PlayerExtendedProperties.getPlayerClass(archer) == 5 && !arrow.isSneaking()) {
+                // Marksman class bonus
+                if (PlayerExtendedProperties.getPlayerClass(archer) == PlayerClass.MARKSMAN && !arrow.isSneaking()) {
 
-                    //Double shots
+                    // Double shots
                     if (PlayerExtendedProperties.from(archer).loadDoubleShotCount() > 0) {
 
                         int countArrows = 0;
@@ -84,7 +86,7 @@ public final class BowEventHandler {
                         }
                     }
 
-                    //Charged shots
+                    // Charged shots
                     if (PlayerExtendedProperties.from(archer).loadFireShotCount() <= 0) {
                         PlayerExtendedProperties.from(archer).saveFireShotCount(5);
                         arrow.setDamage(arrow.getDamage()*1.5);
@@ -100,18 +102,14 @@ public final class BowEventHandler {
         }
     }
 
-    //Archery skill
+    // Archery skill bonus
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onBowUse(PlayerUseItemEvent.Start event) {
         if (event.item != null && event.item.getMaxStackSize() == 1 && event.item.getItemUseAction() == EnumAction.bow) {
-            int archer = getArcherSkill(event.entityPlayer);
-            if (archer != 0 && event.duration > archer / 5) {
-                event.duration -= (archer / 5);
+            int archerySkill = PlayerExtendedProperties.getSkill(event.entityPlayer, PlayerSkill.ARCHERY);
+            if (archerySkill != 0 && event.duration > archerySkill / 5) {
+                event.duration -= (archerySkill / 5);
             }
         }
-    }
-
-    public static int getArcherSkill(EntityPlayer player) {
-        return PlayerExtendedProperties.getSkillFromIndex(player, 5);
     }
 }

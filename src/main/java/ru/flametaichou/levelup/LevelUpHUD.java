@@ -10,6 +10,8 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import ru.flametaichou.levelup.Handlers.FMLEventHandler;
 import ru.flametaichou.levelup.Handlers.PlayerEventHandler;
+import ru.flametaichou.levelup.Model.PlayerClass;
+import ru.flametaichou.levelup.Model.PlayerSkill;
 
 import java.awt.*;
 import java.util.List;
@@ -24,13 +26,13 @@ public final class LevelUpHUD extends Gui {
     }
 
     public void addToText(List<String> left) {
-        byte playerClass = PlayerExtendedProperties.getPlayerClass(LevelUp.proxy.getPlayer());
-        if (playerClass != 0) {
-        	int skillXP = PlayerExtendedProperties.from(LevelUp.proxy.getPlayer()).getSkillFromIndex("XP");
+        PlayerClass playerClass = PlayerExtendedProperties.getPlayerClass(LevelUp.proxy.getPlayer());
+        if (playerClass != PlayerClass.NONE) {
+        	int skillXP = PlayerExtendedProperties.from(LevelUp.proxy.getPlayer()).getSkillFromIndex(PlayerSkill.EXP);
             if ((!LevelUp.renderExpBar) && (skillXP > 0))
-                left.add(StatCollector.translateToLocalFormatted("hud.skill.text2", StatCollector.translateToLocal("class" + playerClass + ".name")) + " (очки умений: " + skillXP + ")");
+                left.add(StatCollector.translateToLocalFormatted("hud.skill.text2", StatCollector.translateToLocal("class." + playerClass + ".name")) + " (очки умений: " + skillXP + ")");
             else
-            	left.add(StatCollector.translateToLocalFormatted("hud.skill.text2", StatCollector.translateToLocal("class" + playerClass + ".name")));
+            	left.add(StatCollector.translateToLocalFormatted("hud.skill.text2", StatCollector.translateToLocal("class." + playerClass + ".name")));
         } else if (canSelectClass()) {
             if (!LevelUp.renderExpBar) {
                 left.add(StatCollector.translateToLocal("hud.skill.select"));
@@ -53,9 +55,9 @@ public final class LevelUpHUD extends Gui {
         if(!LevelUp.changeFOV && !event.entity.isUsingItem()) {
             int skill = 0;
             if(event.entity.isSneaking()){
-                skill = 2 * FMLEventHandler.getSkill(event.entity, 8);
+                skill = 2 * PlayerExtendedProperties.getSkill(event.entity, PlayerSkill.SNEAKING);
             }else if(event.entity.isSprinting()){
-                skill = FMLEventHandler.getSkill(event.entity, 6);
+                skill = PlayerExtendedProperties.getSkill(event.entity, PlayerSkill.ATHLETICS);
             }
             if(skill > 0){
                 event.newfov -= 0.5F;
@@ -78,7 +80,7 @@ public final class LevelUpHUD extends Gui {
         }
         String text = null;
         if (canShowSkills()) {
-            int skillXP = PlayerExtendedProperties.from(LevelUp.proxy.getPlayer()).getSkillFromIndex("XP");
+            int skillXP = PlayerExtendedProperties.from(LevelUp.proxy.getPlayer()).getSkillFromIndex(PlayerSkill.EXP);
             if (skillXP > 0)
                 text = StatCollector.translateToLocalFormatted("hud.skill.text1", skillXP);
         } else if (canSelectClass())

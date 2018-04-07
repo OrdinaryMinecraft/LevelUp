@@ -2,8 +2,6 @@ package ru.flametaichou.levelup.Handlers;
 
 import java.util.*;
 
-import com.ibm.icu.util.BytesTrie;
-import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
@@ -19,19 +17,19 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityFishHook;
 import net.minecraft.init.Items;
 import net.minecraft.item.*;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.util.ForgeDirection;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import ru.flametaichou.levelup.ClassBonus;
-import ru.flametaichou.levelup.LevelUp;
-import ru.flametaichou.levelup.PlayerExtendedProperties;
+import ru.flametaichou.levelup.*;
+import ru.flametaichou.levelup.Model.PacketChannel;
+import ru.flametaichou.levelup.Model.PlayerClass;
+import ru.flametaichou.levelup.Model.PlayerSkill;
 import ru.flametaichou.levelup.Util.WorldUtils;
 
 public final class FMLEventHandler {
@@ -46,16 +44,12 @@ public final class FMLEventHandler {
     /**
      * Number of ticks a furnace run
      */
-    //private static final int maxFurnaceCookTime = 200;
     public static final FMLEventHandler INSTANCE = new FMLEventHandler();
     /**
      * Blocks that could be crops, but should be left alone by Farming skill
      */
     private List<String> blackListedCrops;
     final Random random = new Random();
-    int waterCounter;
-    int waterCounterPrev;
-    boolean flagCounter;
     boolean flagSetCounter;
     final int [] negativeEffects = {2, 4, 9, 15, 17, 18, 19, 20};
     
@@ -75,48 +69,48 @@ public final class FMLEventHandler {
 
             if (player.worldObj.getWorldTime() % 50 == 0) {
                 // Miner class bonus
-                if (player.posY < 50 && PlayerExtendedProperties.getPlayerClass(player) == 1) {
+                if (player.posY < 50 && PlayerExtendedProperties.getPlayerClass(player) == PlayerClass.MINER) {
                     player.addPotionEffect(new PotionEffect(Potion.digSpeed.id, 80, 0, true));
-                    System.out.println("test");
                 }
                 // Hunter class bonus
-                if (WorldUtils.isNight(event.player.worldObj) && PlayerExtendedProperties.getPlayerClass(player) == 8) {
+                if (WorldUtils.isNight(event.player.worldObj) && PlayerExtendedProperties.getPlayerClass(player) == PlayerClass.HUNTER) {
                     player.addPotionEffect(new PotionEffect(Potion.nightVision.id, 250, 0, true));
-                    System.out.println("test");
                 }
             }
 
-            //underwater bonus
+            // Swimming skill bonus
     		if (player.isInWater())
     		{
-    			int bonus = getSkill(player, 7);
+    			int bonus = PlayerExtendedProperties.getSkill(player, PlayerSkill.SWIMMING);
     			float multiplier = Math.max(0.0F,bonus);
     			player.moveFlying(player.moveStrafing * multiplier, player.moveForward * multiplier, 0.02f);
         		flagSetCounter = false;
     		}
     		else if (!flagSetCounter) {
-    			int bonus = getSkill(player, 7);
+    			int bonus = PlayerExtendedProperties.getSkill(player, PlayerSkill.SWIMMING);
     			PlayerExtendedProperties.from(player).sendAirData(bonus / 5);
     			flagSetCounter = true;
     		}
    
-            //Give points on levelup
-            if (PlayerExtendedProperties.getPlayerClass(player) != 0 && player.isEntityAlive()) {
+            // Give points on levelup
+            if (PlayerExtendedProperties.getPlayerClass(player) != PlayerClass.NONE && player.isEntityAlive()) {
                 double diff = PlayerEventHandler.xpPerLevel * (player.experienceLevel - PlayerEventHandler.minLevel) + ClassBonus.getBonusPoints() - PlayerExtendedProperties.from(player).getSkillPoints();
                 if (diff >= 1.0D) {
-                    PlayerExtendedProperties.from(player).addToSkill("XP", (int) Math.floor(diff));
+                    PlayerExtendedProperties.from(player).addToSkill(PlayerSkill.EXP, (int) Math.floor(diff));
                 }
             }
             
-            //Farming grow crops
-            int skill;
-            if (!player.worldObj.isRemote && player.getCurrentEquippedItem()!=null && player.getCurrentEquippedItem().getItem() instanceof ItemHoe && (skill = getSkill(player, 9)) != 0 && player.getRNG().nextFloat() <= skill / 2500F) {
+            // Farming skill bonus
+            int skill = PlayerExtendedProperties.getSkill(player, PlayerSkill.FARMING);
+            if (!player.worldObj.isRemote && player.getCurrentEquippedItem() != null &&
+                    player.getCurrentEquippedItem().getItem() instanceof ItemHoe &&
+                    skill != 0 && player.getRNG().nextFloat() <= skill / 2500F) {
                 growCropsAround(player.worldObj, skill / 4, player);
             }
-            //Athletics speed
+            // Athletics skill bonus
             IAttributeInstance atinst = player.getEntityAttribute(SharedMonsterAttributes.movementSpeed);
             AttributeModifier mod;
-            skill = getSkill(player, 6);
+            skill = PlayerExtendedProperties.getSkill(player, PlayerSkill.ATHLETICS);
             if (skill != 0) {
                 mod = new AttributeModifier(speedID, "SprintingSkillSpeed", skill / 100F, 2);
                 if (player.isSprinting()) {
@@ -130,8 +124,8 @@ public final class FMLEventHandler {
                     player.fallDistance *= 1 - skill / 5 / 100F;
                 }
             }
-            //Sneaking speed
-            skill = getSkill(player, 8);
+            // Sneaking skill bonus
+            skill = PlayerExtendedProperties.getSkill(player, PlayerSkill.SNEAKING);
             if (skill != 0) {
                 mod = new AttributeModifier(sneakID, "SneakingSkillSpeed", 2 * skill / 100F, 2);
                 if (player.isSneaking()) {
@@ -146,23 +140,23 @@ public final class FMLEventHandler {
             /*
              * Fishing skill
              */
-            int skillFishing = getSkill(player, 10);
+            int skillFishing = PlayerExtendedProperties.getSkill(player, PlayerSkill.FISHING);
             if (skillFishing > 0)
             if (event.player.fishEntity != null) {
                 EntityFishHook hook = event.player.fishEntity;
-                //Если поправок не в воде (до поклевки, находясь на поверхности воды
-                //считается что поплавок находится не в воде)
+                // Если поправок не в воде (до поклевки, находясь на поверхности воды
+                // считается что поплавок находится не в воде)
                 if (!hook.isInWater()) {
                     if (hook.worldObj.getWorldTime() % 15 == 0) { //15 - время, за которое можно успеть схватить рыбу на крючке
                         if (hook.motionY > 0) hook.setSneaking(false);
                     }
-                    //Тут проверяется, летит ли еще поплавок в воду, или он уже остановился и занял позицию
+                    // Тут проверяется, летит ли еще поплавок в воду, или он уже остановился и занял позицию
                     if (Math.abs(hook.motionX - hook.motionZ) <= 0.05) {
                         Random random = new Random();
                         if (!hook.worldObj.isRemote) {
                             if (random.nextInt(2000) + 1 >= 2000-skillFishing) {
                                 hook.motionY -= 0.20000000298023224D;
-                                //Это победа
+                                // Это победа
                                 hook.setSneaking(true);
                                 hook.playSound("random.splash", 0.25F, 1.0F + (random.nextFloat() - random.nextFloat()) * 0.4F);
                                 float f1 = (float) MathHelper.floor_double(hook.boundingBox.minY);
@@ -178,22 +172,6 @@ public final class FMLEventHandler {
     }
     
     public void removeEffects (EntityPlayer player) {
-    	/*if (player.getActivePotionEffect(Potion.blindness) != null)
-			player.removePotionEffect(Potion.blindness.id);
-		if (player.getActivePotionEffect(Potion.digSlowdown) != null)
-			player.removePotionEffect(Potion.digSlowdown.id);
-		if (player.getActivePotionEffect(Potion.moveSlowdown) != null)
-			player.removePotionEffect(Potion.moveSlowdown.id);
-		if (player.getActivePotionEffect(Potion.confusion) != null)
-			player.removePotionEffect(Potion.confusion.id);
-		if (player.getActivePotionEffect(Potion.hunger) != null)
-			player.removePotionEffect(Potion.hunger.id);
-		if (player.getActivePotionEffect(Potion.weakness) != null)
-			player.removePotionEffect(Potion.weakness.id);
-		if (player.getActivePotionEffect(Potion.poison) != null)
-			player.removePotionEffect(Potion.poison.id);
-		if (player.getActivePotionEffect(Potion.wither) != null)
-			player.removePotionEffect(Potion.wither.id);*/
     	for (int i = 0; i < negativeEffects.length; i++) {
     		player.removePotionEffect(negativeEffects[i]);
     	}
@@ -237,37 +215,28 @@ public final class FMLEventHandler {
     }
 
     /**
-     * Helper to retrieve skill points from the index
-     */
-    public static int getSkill(EntityPlayer player, int id) {
-        return PlayerExtendedProperties.getSkillFromIndex(player, id);
-    }
-
-    /**
      * Add more output when smelting food for Cooking and other items for Smelting
      */
     @SubscribeEvent
     public void onSmelting(PlayerEvent.ItemSmeltedEvent event) {
     	LevelUp.takenFromSmelting(event.player, event.smelting);
-        byte playerClass = PlayerExtendedProperties.getPlayerClass(event.player);
+        PlayerClass playerClass = PlayerExtendedProperties.getPlayerClass(event.player);
         // Peasant class bonus
     	// Smith class bonus
     	if (!event.player.worldObj.isRemote) {
             Random random = event.player.getRNG();
             ItemStack add = null;
             if (event.smelting.getItemUseAction() == EnumAction.eat) {
-                if (playerClass == 9) {
+                if (playerClass == PlayerClass.PEASANT) {
                     if (Math.random() <= 0.15) {
                         add = event.smelting.copy();
+                        event.player.addChatComponentMessage(new ChatComponentTranslation("peasant.smelting.double"));
                     }
                 }
-//                if (random.nextFloat() <= getSkill(event.player, 7) / 200F) {
-//                    add = event.smelting.copy();
-//                    System.out.println("test");
-//                }
-            } else if (playerClass == 3) {
+            } else if (playerClass == PlayerClass.SMITH) {
                 if (Math.random() <= 0.15) {
                     add = event.smelting.copy();
+                    event.player.addChatComponentMessage(new ChatComponentTranslation("smith.smelting.double"));
                 }
             }
             EntityItem entityitem = ForgeHooks.onPlayerTossEvent(event.player, add, true);
@@ -303,10 +272,13 @@ public final class FMLEventHandler {
     public void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
         loadPlayer(event.player);
     }
-    
-    // Increase HP
+
+    /**
+     * Vitality skill bonus
+     * Increase HP
+     */
     public void updatePlayerHP (EntityPlayer player) {
-    	int skill = getSkill(player, 2);
+    	int skill = PlayerExtendedProperties.getSkill(player, PlayerSkill.VITALITY);
         player.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(20 + (2 * skill / 5));
     }
 
@@ -327,10 +299,9 @@ public final class FMLEventHandler {
      */
     public void loadPlayer(EntityPlayer player) {
         if (player instanceof EntityPlayerMP) {
-            byte cl = PlayerExtendedProperties.getPlayerClass(player);
+            PlayerClass pClass = PlayerExtendedProperties.getPlayerClass(player);
             int[] data = PlayerExtendedProperties.from(player).getPlayerData(false);
-            LevelUp.initChannel.sendTo(SkillPacketHandler.getPacket(Side.CLIENT, 0, cl, data), (EntityPlayerMP) player);
-            //getExtPropsFromServer
+            LevelUp.initChannel.sendTo(SkillPacketHandler.getPacket(Side.CLIENT, PacketChannel.LEVELUPINIT, (byte) pClass.getId(), data), (EntityPlayerMP) player);
             FMLProxyPacket packet = SkillPacketHandler.getExtPropPacket(Side.CLIENT, PlayerExtendedProperties.from(player).loadExtendedProperties().toString());
             LevelUp.extPropertiesChannel.sendTo(packet, (EntityPlayerMP) player);
         }

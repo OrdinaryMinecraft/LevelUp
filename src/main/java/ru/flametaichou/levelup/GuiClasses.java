@@ -1,15 +1,29 @@
 package ru.flametaichou.levelup;
 
+import com.sun.xml.internal.bind.v2.runtime.reflect.Lister;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
+import org.lwjgl.opengl.GL11;
 import ru.flametaichou.levelup.Handlers.SkillPacketHandler;
+import ru.flametaichou.levelup.Model.PacketChannel;
+import ru.flametaichou.levelup.Model.PlayerClass;
+import ru.flametaichou.levelup.Util.EnumUtils;
 
 public final class GuiClasses extends GuiScreen {
     private boolean closedWithButton = false;
-    private byte cl = 0;
+    private PlayerClass pClass = PlayerClass.NONE;
+    private ItemStack stack;
+    private GuiTextField text;
+    private static final ResourceLocation texture = new ResourceLocation(LevelUp.ID, "textures/gui/lvlup-gui.png");
 
     @Override
     public boolean doesGuiPauseGame() {
@@ -19,8 +33,22 @@ public final class GuiClasses extends GuiScreen {
     @Override
     public void drawScreen(int i, int j, float f) {
         drawDefaultBackground();
-        drawCenteredString(fontRendererObj, StatCollector.translateToLocal("class" + cl + ".tooltip"), width / 2, height / 6 + 148, 0xffffff);
-        drawCenteredString(fontRendererObj, StatCollector.translateToLocalFormatted("gui.class.title", StatCollector.translateToLocal("class" + cl + ".name")), width / 2, height / 6 + 174, 0xffffff);
+        this.text.drawTextBox();
+        drawString(fontRendererObj, StatCollector.translateToLocal("class." + pClass.name() + ".tooltip1"), this.text.xPosition+3, this.text.yPosition+3, 0xffffff);
+        drawString(fontRendererObj, StatCollector.translateToLocal("class." + pClass.name() + ".tooltip2"), this.text.xPosition+3, this.text.yPosition+15, 0xffffff);
+        drawString(fontRendererObj, StatCollector.translateToLocal("class." + pClass.name() + ".tooltip3"), this.text.xPosition+3, this.text.yPosition+27, 0xffffff);
+        drawCenteredString(fontRendererObj, StatCollector.translateToLocalFormatted("gui.class.title", StatCollector.translateToLocal("class." + pClass.name() + ".name")), width / 2, height / 6 + 174, 0xffffff);
+        for (Object obj : buttonList) {
+            GuiButton button = (GuiButton) obj;
+            if (button.id != 0 && button.id != 100){
+                PlayerClass buttonClass = EnumUtils.getPlayerClassFromId(button.id);
+                mc.getTextureManager().bindTexture(texture);
+                drawTexturedModalRect(button.xPosition-24, button.yPosition-4, 0,0, 61, 30);
+                mc.getTextureManager().bindTexture(TextureMap.locationItemsTexture);
+                drawTexturedModelRectFromIcon(button.xPosition-21, button.yPosition, buttonClass.getIcon(), 20, 20);
+            }
+
+        }
         super.drawScreen(i, j, f);
     }
 
@@ -31,20 +59,27 @@ public final class GuiClasses extends GuiScreen {
         buttonList.clear();
         buttonList.add(new GuiButton(0, width / 2 + 96, height / 6 + 168, 96, 20, StatCollector.translateToLocal("gui.done")));
         buttonList.add(new GuiButton(100, width / 2 - 192, height / 6 + 168, 96, 20, StatCollector.translateToLocal("gui.cancel")));
-        for (int j = 1; j < 13; j = j + 3) {
+        for (int j = 1; j <= 9; j = j + 3) {
             for (int i = 0; i < 3; i++) {
-                GuiButton button = new GuiButton(i + j, width / 2 - 160 + i * 112, 18 + 32 * (j - 1) / 3, 96, 20, StatCollector.translateToLocal("class" + (i + j) + ".name"));
-                if (i + j == 4 || i + j == 6 || i + j == 7) button.enabled = false;
+                int xPosition = width / 2 - 160 + i * 112;
+                int yPosition = 18 + 32 * (j - 1) / 3;
+                GuiButton button = new GuiButton(i + j, xPosition+20, yPosition, 76, 20, StatCollector.translateToLocal("class." + EnumUtils.getPlayerClassFromId(i + j) + ".name"));
                 buttonList.add(button);
             }
         }
+        int textX = width / 2 - 160;
+        int textY = 18 + 32 * 4;
+        this.text = new GuiTextField(this.fontRendererObj, textX-4, textY, width - textX * 2, 40);
+        text.setMaxStringLength(255);
+        text.setText("");
+        this.text.setFocused(false);
         // buttonList.add(new GuiButton(13, width / 2 - 48, 146, 96, 20, StatCollector.translateToLocal("class13.name")));
     }
 
     @Override
     public void onGuiClosed() {
-        if (closedWithButton && cl != 0) {
-            FMLProxyPacket packet = SkillPacketHandler.getPacket(Side.SERVER, 1, cl);
+        if (closedWithButton && pClass != PlayerClass.NONE) {
+            FMLProxyPacket packet = SkillPacketHandler.getPacket(Side.SERVER, PacketChannel.LEVELUPCLASSES, (byte) pClass.getId());
             LevelUp.classChannel.sendToServer(packet);
         }
     }
@@ -60,7 +95,8 @@ public final class GuiClasses extends GuiScreen {
             mc.displayGuiScreen(null);
             mc.setIngameFocus();
         } else {
-            cl = (byte) guibutton.id;
+            pClass = EnumUtils.getPlayerClassFromId(guibutton.id);
+            //text.setText(StatCollector.translateToLocal("class." + pClass.name() + ".tooltip"));
         }
     }
 }

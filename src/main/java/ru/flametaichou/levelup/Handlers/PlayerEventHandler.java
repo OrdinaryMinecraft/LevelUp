@@ -26,7 +26,6 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.FishingHooks;
 import net.minecraftforge.common.IExtendedEntityProperties;
-import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.*;
@@ -34,8 +33,9 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.oredict.OreDictionary;
 import ru.flametaichou.levelup.ClassBonus;
-import ru.flametaichou.levelup.Items.ItemFishingLootBox;
 import ru.flametaichou.levelup.LevelUp;
+import ru.flametaichou.levelup.Model.PlayerClass;
+import ru.flametaichou.levelup.Model.PlayerSkill;
 import ru.flametaichou.levelup.PlayerExtendedProperties;
 
 import java.util.*;
@@ -106,7 +106,7 @@ public final class PlayerEventHandler {
                 event.newSpeed = event.newSpeed * itemstack.func_150997_a(event.block) / 3F;
             }
         if (event.block instanceof BlockStone || event.block == Blocks.cobblestone || event.block == Blocks.obsidian || (event.block instanceof BlockOre)) {
-            event.newSpeed = event.newSpeed + getSkill(event.entityPlayer, 0) / 5 * 0.2F;
+            event.newSpeed = event.newSpeed + getSkill(event.entityPlayer, PlayerSkill.MINING) / 5 * 0.2F;
         }
 //        else if (event.block.getMaterial() == Material.wood) {
 //            event.newSpeed = event.newSpeed + getSkill(event.entityPlayer, 3) / 5 * 0.2F;
@@ -122,10 +122,10 @@ public final class PlayerEventHandler {
         if (event.entityLiving instanceof EntityPlayer) {
         	//resetPlayerHP((EntityPlayer) event.entityLiving);
             if (resetClassOnDeath) {
-                PlayerExtendedProperties.from((EntityPlayer) event.entityLiving).setPlayerClass((byte) 0);
+                PlayerExtendedProperties.from((EntityPlayer) event.entityLiving).setPlayerClass(PlayerClass.NONE);
             }
             if (resetSkillOnDeath > 0.00F) {
-                PlayerExtendedProperties.from((EntityPlayer) event.entityLiving).takeSkillFraction(resetSkillOnDeath);
+                PlayerExtendedProperties.from((EntityPlayer) event.entityLiving).takeSkillPointsFromPlayer(resetSkillOnDeath);
             }
         } else if (event.entityLiving instanceof EntityMob && event.source.getEntity() instanceof EntityPlayer) {
             LevelUp.giveBonusFightingXP((EntityPlayer) event.source.getEntity());
@@ -188,10 +188,10 @@ public final class PlayerEventHandler {
                                 event.entityPlayer.addChatComponentMessage(new ChatComponentTranslation("rare.fish"));
                             }
 
-                            // Здесь добавляем к пойманному луту сундук с сокровищами, если класс игрока - рыбак
+                            // Peasant class bonus
                             bonusLoot = null;
-                            byte pClass = PlayerExtendedProperties.getPlayerClass(event.entityPlayer);
-                            if (pClass == 9) {
+                            PlayerClass pClass = PlayerExtendedProperties.getPlayerClass(event.entityPlayer);
+                            if (pClass == PlayerClass.PEASANT) {
                                 double d = Math.random();
                                 if (d < 0.03) {
                                     bonusLoot = new EntityItem(hook.worldObj, hook.posX, hook.posY, hook.posZ, new ItemStack(LevelUp.fishingLootBox));
@@ -245,7 +245,7 @@ public final class PlayerEventHandler {
             int skill;
             Random random = event.harvester.getRNG();
             if (event.block instanceof BlockOre || event.block instanceof BlockRedstoneOre || ores.contains(event.block)) {
-                skill = getSkill(event.harvester, 0);
+                skill = getSkill(event.harvester, PlayerSkill.MINING);
                 if (!blockToCounter.containsKey(event.block)) {
                     blockToCounter.put(event.block, blockToCounter.size());
                 }
@@ -271,7 +271,7 @@ public final class PlayerEventHandler {
                     }
                 }
             } else if (event.block.getMaterial() == Material.ground) {
-                skill = getSkill(event.harvester, 0);
+                skill = getSkill(event.harvester, PlayerSkill.MINING);
                 if (random.nextFloat() <= skill / 200F) {
                     ItemStack[] aitemstack4 = digLoot;
                     float f = random.nextFloat();
@@ -335,30 +335,30 @@ public final class PlayerEventHandler {
     @SubscribeEvent
     public void onAnvilRepair(AnvilRepairEvent event) {
 
-        byte playerClass = PlayerExtendedProperties.getPlayerClass(event.entityPlayer);
+        PlayerClass playerClass = PlayerExtendedProperties.getPlayerClass(event.entityPlayer);
         if (!event.entityPlayer.worldObj.isRemote) {
             // Blacksmithing skill
             // Smith class bonus
-            if (getSkill(event.entityPlayer, 11) > 0) {
+            if (getSkill(event.entityPlayer, PlayerSkill.BLACKSMITHING) > 0) {
                 if (event.right.getItem().isItemTool(event.right)) {
                     int amount = 0;
-                    if (playerClass == 3) writeItemInfo(event.right, event.entityPlayer, "smith", amount);
+                    if (playerClass == PlayerClass.SMITH) writeItemInfo(event.right, event.entityPlayer, "smith", amount);
                     if (event.right.getItem() instanceof ItemArmor) {
                         //Armor
                     } else if (event.right.getItem() instanceof ItemTool) {
                         //Tools
                     } else {
                         //Swords, Bows, etc
-                        if (Math.random() <= getSkill(event.entityPlayer, 11) / 100D) {
-                            if (playerClass == 3)
+                        if (Math.random() <= getSkill(event.entityPlayer, PlayerSkill.BLACKSMITHING) / 100D) {
+                            if (playerClass == PlayerClass.SMITH)
                                 amount = 2;
                             else
                                 amount = 1;
                             writeItemInfo(event.right, event.entityPlayer, "damage", amount);
                         }
 
-                        if (Math.random() <= getSkill(event.entityPlayer, 11) / 100D) {
-                            if (playerClass == 3)
+                        if (Math.random() <= getSkill(event.entityPlayer, PlayerSkill.BLACKSMITHING) / 100D) {
+                            if (playerClass == PlayerClass.SMITH)
                                 amount = 20;
                             else
                                 amount = 15;
@@ -368,11 +368,11 @@ public final class PlayerEventHandler {
                 }
             }
         } else {
-            if (getSkill(event.entityPlayer, 11) >= 5) {
-                // Возвращаем часть опыта
+            if (getSkill(event.entityPlayer, PlayerSkill.BLACKSMITHING) >= 5) {
+                // Returning exp from repair
                 if (Math.random() < 0.25) {
                     int lvlDiff = PlayerExtendedProperties.from(event.entityPlayer).loadLatestExp() - event.entityPlayer.experienceLevel;
-                    int multiplier = getSkill(event.entityPlayer, 11) / 5 * 5;
+                    int multiplier = getSkill(event.entityPlayer, PlayerSkill.BLACKSMITHING) / 5 * 5;
                     int returnedExp = lvlDiff / 100 * multiplier;
                     if (lvlDiff >= 6 && returnedExp < 1)
                         returnedExp = 1;
@@ -457,7 +457,8 @@ public final class PlayerEventHandler {
 
     private void doCropDrops(BlockEvent.BreakEvent event){
         Random random = event.getPlayer().getRNG();
-        int skill = getSkill(event.getPlayer(), 9);
+        // Farming skill bonus
+        int skill = getSkill(event.getPlayer(), PlayerSkill.FARMING);
         if (random.nextInt(10) < skill / 5) {
             Item ID = event.block.getItemDropped(event.blockMetadata, random, 0);
             if(ID == null){
@@ -513,11 +514,11 @@ public final class PlayerEventHandler {
 
     /**
      * Helper to get a random slot value for the fish drop list
-     *
      * @return -1 if no drop is required
      */
     public static int getBonusFishingLoot(EntityPlayer player) {
-        if (player.getRNG().nextDouble() > (getSkill(player, 10) / 5) * 0.01D) {
+        // Fishing skill bonus
+        if (player.getRNG().nextDouble() > (getSkill(player, PlayerSkill.FISHING) / 5) * 0.01D) {
             return -1;
         } else {
             return player.getRNG().nextInt(bonusFishingLootList.size());
@@ -527,8 +528,8 @@ public final class PlayerEventHandler {
     /**
      * Helper to retrieve skill points from the index
      */
-    public static int getSkill(EntityPlayer player, int id) {
-        return PlayerExtendedProperties.getSkillFromIndex(player, id);
+    public static int getSkill(EntityPlayer player, PlayerSkill playerSkill) {
+        return PlayerExtendedProperties.getSkill(player, playerSkill);
     }
 
     /**

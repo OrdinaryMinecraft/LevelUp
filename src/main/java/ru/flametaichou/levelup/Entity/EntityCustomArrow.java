@@ -40,7 +40,6 @@ public class EntityCustomArrow extends EntityArrow {
     private int ticksInGround = 0;
     private int ticksInAir = 0;
     private float knockbackStrength = 0;
-    //public ArrowEffect effect = ArrowEffect.DEFAULT;
 
     public EntityCustomArrow(World world) {
         super(world);

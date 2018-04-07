@@ -9,13 +9,10 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ChatComponentTranslation;
-import net.minecraftforge.oredict.OreDictionary;
 import org.lwjgl.input.Keyboard;
 import ru.flametaichou.levelup.*;
+import ru.flametaichou.levelup.Model.PlayerClass;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,12 +38,12 @@ public final class SkillKeyHandler {
         if (keyActivate.getIsKeyPressed() && Minecraft.getMinecraft().currentScreen == null && Minecraft.getMinecraft().thePlayer != null) {
 
             EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-            int playerClass = PlayerExtendedProperties.getPlayerClass(player);
+            PlayerClass playerClass = PlayerExtendedProperties.getPlayerClass(player);
             int skillColldown = 20 * 1;
 
             if (player.worldObj.getTotalWorldTime() - PlayerExtendedProperties.from(player).loadLastSkillActivation() > skillColldown) {
-                //Miner
-                if (playerClass == 1) {
+                // Miner class bonus
+                if (playerClass == PlayerClass.MINER) {
                     int radius = 10;
                     int player_x = (int) player.posX;
                     int player_y = (int) player.posY;
@@ -93,13 +90,13 @@ public final class SkillKeyHandler {
                     }
                 }
 
-                //Marksman
-                if (playerClass == 5) {
+                // Marksman class bonus
+                if (playerClass == PlayerClass.MARKSMAN) {
                     PlayerExtendedProperties.from(player).sendDoubleShotCount(3);
                 }
 
-                //Swordsman
-                if (playerClass == 2) {
+                // Swordsman class bonus
+                if (playerClass == PlayerClass.SWORDSMAN) {
                     FMLProxyPacket packet = SkillPacketHandler.getOtherPacket(Side.SERVER, "swordsmanBuff");
                     LevelUp.otherChannel.sendToServer(packet);
                 }

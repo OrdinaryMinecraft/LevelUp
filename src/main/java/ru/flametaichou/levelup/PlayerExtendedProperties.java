@@ -4,31 +4,33 @@ import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IExtendedEntityProperties;
 import ru.flametaichou.levelup.Handlers.SkillPacketHandler;
 import ru.flametaichou.levelup.Model.ExtPropPacket;
+import ru.flametaichou.levelup.Model.PlayerClass;
+import ru.flametaichou.levelup.Model.PlayerSkill;
+import ru.flametaichou.levelup.Util.EnumUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public final class PlayerExtendedProperties implements IExtendedEntityProperties {
-    private byte playerClass;
+    private PlayerClass playerClass = PlayerClass.NONE;
     private int airBars;
     private boolean clearEffects;
     private long lastSkillActivation;
     private int doubleShotCount;
     private int fireShotCount;
     private int latestExp;
-    private Map<String, Integer> skillMap = new HashMap<String, Integer>();
+    private Map<PlayerSkill, Integer> skillMap = new HashMap<PlayerSkill, Integer>();
     private Map<String, int[]> counterMap = new HashMap<String, int[]>();
     public final static String[] counters = {"ore", "craft", "bonus"};
 
     public PlayerExtendedProperties() {
-        for (String name : ClassBonus.skillNames)
-            skillMap.put(name, 0);
+        for (PlayerSkill skill : PlayerSkill.values())
+            skillMap.put(skill, 0);
         counterMap.put(counters[0], new int[]{0, 0, 0, 0});
         counterMap.put(counters[1], new int[]{0, 0, 0, 0});
         counterMap.put(counters[2], new int[]{0, 0, 0});//ore bonus, craft bonus, kill bonus
@@ -36,14 +38,14 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
 
     @Override
     public void saveNBTData(NBTTagCompound compound) {
-        compound.setByte("Class", playerClass);
-        compound.setInteger("AirBars", skillMap.get("Swimming") / 5);
+        compound.setString("Class", playerClass.name());
+        compound.setInteger("AirBars", skillMap.get(PlayerSkill.SWIMMING) / 5);
         compound.setBoolean("ClearEffects", clearEffects);
         compound.setLong("LastSkillActivation", lastSkillActivation);
         compound.setInteger("DoubleShotCount", doubleShotCount);
         compound.setInteger("FireShotCount", fireShotCount);
-        for (String name : ClassBonus.skillNames) {
-            compound.setInteger(name, skillMap.get(name));
+        for (PlayerSkill skill : PlayerSkill.values()) {
+            compound.setInteger(skill.name(), skillMap.get(skill));
         }
         for (String cat : counters) {
             compound.setIntArray(cat, counterMap.get(cat));
@@ -164,14 +166,14 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
 
     @Override
     public void loadNBTData(NBTTagCompound compound) {
-        playerClass = compound.getByte("Class");
+        playerClass = PlayerClass.valueOf(compound.getString("Class"));
         airBars = compound.getInteger("AirBars");
         clearEffects = compound.getBoolean("ClearEffects");
         lastSkillActivation = compound.getLong("LastSkillActivation");
         doubleShotCount = compound.getInteger("DoubleShotCount");
         fireShotCount = compound.getInteger("FireShotCount");
-        for (String name : ClassBonus.skillNames) {
-            skillMap.put(name, compound.getInteger(name));
+        for (PlayerSkill skill : PlayerSkill.values()) {
+            skillMap.put(skill, compound.getInteger(skill.name()));
         }
         for (String cat : counters) {
             counterMap.put(cat, compound.getIntArray(cat));
@@ -186,35 +188,38 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
         return ((PlayerExtendedProperties) player.getExtendedProperties(ClassBonus.SKILL_ID));
     }
 
-    public void addToSkill(String name, int value) {
-        skillMap.put(name, skillMap.get(name) + value);
+    public void addToSkill(PlayerSkill skill, int value) {
+        skillMap.put(skill, skillMap.get(skill) + value);
     }
 
-    public int getSkillFromIndex(String name) {
-        return skillMap.get(name);
+    public int getSkillFromIndex(PlayerSkill skill) {
+        return skillMap.get(skill);
     }
 
-    public static int getSkillFromIndex(EntityPlayer player, int id) {
-        return from(player).getSkillFromIndex(ClassBonus.skillNames[id]);
+    public static int getSkill(EntityPlayer player, PlayerSkill playerSkill) {
+        return from(player).getSkillFromIndex(playerSkill);
     }
 
     public int getSkillPoints() {
         int total = 0;
-        for (String skill : ClassBonus.skillNames) {
+        for (PlayerSkill skill : PlayerSkill.values()) {
             total += getSkillFromIndex(skill);
         }
         return total;
     }
 
     public boolean hasClass() {
-        return playerClass != 0;
+        boolean result = false;
+        if (playerClass != null && playerClass != PlayerClass.NONE)
+            result = true;
+        return result;
     }
 
-    public static byte getPlayerClass(EntityPlayer player) {
+    public static PlayerClass getPlayerClass(EntityPlayer player) {
         return from(player).playerClass;
     }
 
-    public void setPlayerClass(byte newClass) {
+    public void setPlayerClass(PlayerClass newClass) {
         if (newClass != playerClass) {
             ClassBonus.applyBonus(this, playerClass, newClass);
             capSkills();
@@ -230,57 +235,58 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
      * Проверяет, не превышен ли лимит прокачки навыков
      */
     public void capSkills() {
-        for (String name : ClassBonus.skillNames) {
-            if (name.equals("XP"))
+        for (PlayerSkill skill : PlayerSkill.values()) {
+            if (skill == PlayerSkill.EXP)
                 continue;
-            int j = skillMap.get(name);
+            int j = skillMap.get(skill);
             if (j > ClassBonus.getMaxSkillPoints()) {
-                skillMap.put(name, ClassBonus.getMaxSkillPoints());
+                skillMap.put(skill, ClassBonus.getMaxSkillPoints());
             }
         }
     }
 
-    public void takeSkillFraction(float ratio) {
-        final byte clas = playerClass;
-        if (clas != 0) {
-            ClassBonus.applyBonus(this, clas, (byte) 0);
-            playerClass = 0;
+    public void takeSkillPointsFromPlayer(float ratio) {
+        final PlayerClass pClass = playerClass;
+        if (pClass != PlayerClass.NONE) {
+            ClassBonus.applyBonus(this, pClass, PlayerClass.NONE);
+            playerClass = PlayerClass.NONE;
         }
-        for (String name : ClassBonus.skillNames) {
-            final int value = skillMap.get(name);
+        for (PlayerSkill skill : PlayerSkill.values()) {
+            final int value = skillMap.get(skill);
             int remove = (int) (value * ratio);
             if (remove > 0) {
-                skillMap.put(name, value - remove);
+                skillMap.put(skill, value - remove);
             }
         }
-        if (clas != 0) {
-            ClassBonus.applyBonus(this, (byte) 0, clas);
-            playerClass = clas;
+        if (pClass != PlayerClass.NONE) {
+            ClassBonus.applyBonus(this, PlayerClass.NONE, pClass);
+            playerClass = pClass;
         }
         capSkills();
     }
 
     public void convertPointsToXp(boolean resetClass) {
-        final byte clas = playerClass;
-        setPlayerClass((byte) 0);
-        skillMap.put("XP", getSkillPoints());
-        setPlayerData(new int[ClassBonus.skillNames.length - 1]);
+        final PlayerClass pClass = playerClass;
+        setPlayerClass(PlayerClass.NONE);
+        skillMap.put(PlayerSkill.EXP, getSkillPoints());
+        setPlayerData(new int[PlayerSkill.EXP.getId()]);
         if (!resetClass)
-            setPlayerClass(clas);
+            setPlayerClass(pClass);
     }
 
     public void setPlayerData(int[] data) {
-        for (int i = 0; i < ClassBonus.skillNames.length && i < data.length; i++) {
-            skillMap.put(ClassBonus.skillNames[i], data[i]);
+        for (int i = 0; i < PlayerSkill.values().length && i < data.length; i++) {
+            skillMap.put(EnumUtils.getPlayerSkillFromId(i), data[i]);
         }
     }
 
     public int[] getPlayerData(boolean withClass) {
-        int[] data = new int[ClassBonus.skillNames.length + (withClass ? 1 : 0)];
-        for (int i = 0; i < ClassBonus.skillNames.length; i++)
-            data[i] = getSkillFromIndex(ClassBonus.skillNames[i]);
+        int[] data = new int[PlayerSkill.values().length + (withClass ? 1 : 0)];
+        for (int i = 0; i < PlayerSkill.values().length; i++) {
+            data[i] = getSkillFromIndex(EnumUtils.getPlayerSkillFromId(i));
+        }
         if (withClass)
-            data[data.length - 1] = playerClass;
+            data[data.length - 1] = playerClass.getId();
         return data;
     }
 }

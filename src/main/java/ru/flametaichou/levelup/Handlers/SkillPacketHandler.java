@@ -1,5 +1,6 @@
 package ru.flametaichou.levelup.Handlers;
 
+import com.sun.org.apache.xml.internal.utils.SystemIDResolver;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
@@ -12,32 +13,32 @@ import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.common.config.Property;
-import ru.flametaichou.levelup.ClassBonus;
-import ru.flametaichou.levelup.LevelUp;
+import ru.flametaichou.levelup.*;
 import ru.flametaichou.levelup.Model.ExtPropPacket;
-import ru.flametaichou.levelup.PlayerExtendedProperties;
+import ru.flametaichou.levelup.Model.PacketChannel;
+import ru.flametaichou.levelup.Model.PlayerSkill;
+import ru.flametaichou.levelup.Util.EnumUtils;
 
 public final class SkillPacketHandler {
-    public static final String[] CHAN = {"LEVELUPINIT", "LEVELUPCLASSES", "LEVELUPSKILLS", "LEVELUPCFG", "LEVELUPEXTPROP", "LEVELUPOTHER"};
 
     @SubscribeEvent
     public void onServerPacket(FMLNetworkEvent.ServerCustomPacketEvent event) {
-        if (event.packet.channel().equals(CHAN[1]))
+        if (event.packet.channel().equals(PacketChannel.LEVELUPCLASSES.name()))
             handleClassChange(event.packet.payload().readByte(), ((NetHandlerPlayServer) event.handler).playerEntity);
-        else if (event.packet.channel().equals(CHAN[2])) {
+        else if (event.packet.channel().equals(PacketChannel.LEVELUPSKILLS.name())) {
             handlePacket(event.packet, ((NetHandlerPlayServer) event.handler).playerEntity);
-            //increase HP
+            // Increase HP
             FMLEventHandler.INSTANCE.updatePlayerHP(((NetHandlerPlayServer) event.handler).playerEntity);
-        } if (event.packet.channel().equals(CHAN[4])) {
+        } if (event.packet.channel().equals(PacketChannel.LEVELUPEXTPROP.name())) {
             handleExtPropsChange(event.packet, ((NetHandlerPlayServer) event.handler).playerEntity);
-        } if (event.packet.channel().equals(CHAN[5])) {
+        } if (event.packet.channel().equals(PacketChannel.LEVELUPOTHER.name())) {
             handleOtherPacket(event.packet, ((NetHandlerPlayServer) event.handler).playerEntity);
         }
     }
 
     private void handleClassChange(byte newClass, EntityPlayerMP entityPlayerMP) {
         if (newClass >= 0) {
-            PlayerExtendedProperties.from(entityPlayerMP).setPlayerClass(newClass);
+            PlayerExtendedProperties.from(entityPlayerMP).setPlayerClass(EnumUtils.getPlayerClassFromId(newClass));
             FMLEventHandler.INSTANCE.loadPlayer(entityPlayerMP);
         }
     }
@@ -77,9 +78,9 @@ public final class SkillPacketHandler {
 
     @SubscribeEvent
     public void onClientPacket(FMLNetworkEvent.ClientCustomPacketEvent event) {
-        if (event.packet.channel().equals(CHAN[0]))
+        if (event.packet.channel().equals(PacketChannel.LEVELUPINIT.name()))
             handlePacket(event.packet, LevelUp.proxy.getPlayer());
-        else if (event.packet.channel().equals(CHAN[3]))
+        else if (event.packet.channel().equals(PacketChannel.LEVELUPCFG.name()))
             handleConfig(event.packet);
     }
 
@@ -88,41 +89,43 @@ public final class SkillPacketHandler {
         byte button = buf.readByte();
         int[] data = null;
         int sum = 0;
-        if (packet.channel().equals(CHAN[0]) || button == -1) {
-            data = new int[ClassBonus.skillNames.length];
+
+        if (packet.channel().equals(PacketChannel.LEVELUPINIT.name()) || button == -1) {
+            data = new int[PlayerSkill.values().length];
             for (int i = 0; i < data.length; i++) {
                 data[i] = buf.readInt();
                 sum += data[i];
             }
         }
+
         PlayerExtendedProperties properties = PlayerExtendedProperties.from(player);
-        if (packet.channel().equals(CHAN[2])) {
+        if (packet.channel().equals(PacketChannel.LEVELUPSKILLS.name())) {
             if (properties.hasClass())
                 if (data != null && button == -1 && sum == 0) {
-                    if (data[data.length - 1] != 0 && -data[data.length - 1] <= properties.getSkillFromIndex("XP")) {
+                    if (data[PlayerSkill.EXP.getId()] != 0 && -data[PlayerSkill.EXP.getId()] <= properties.getSkillFromIndex(PlayerSkill.EXP)) {
                         for (int index = 0; index < data.length; index++) {
                             if (data[index] != 0) {
-                                properties.addToSkill(ClassBonus.skillNames[index], data[index]);
+                                properties.addToSkill(PlayerSkill.valueOf(PlayerSkill.values()[index].name()), data[index]);
                             }
                         }
                         FMLEventHandler.INSTANCE.loadPlayer(player);
                     }
                 }
-        } else if (packet.channel().equals(CHAN[0]) && data != null) {
-            properties.setPlayerClass(button);
+        } else if (packet.channel().equals(PacketChannel.LEVELUPINIT.name()) && data != null) {
+            properties.setPlayerClass(EnumUtils.getPlayerClassFromId(button));
             properties.setPlayerData(data);
         }
         FMLEventHandler.INSTANCE.updatePlayerHP(player);
     }
 
-    public static FMLProxyPacket getPacket(Side side, int channel, byte id, int... dat) {
+    public static FMLProxyPacket getPacket(Side side, PacketChannel channel, byte id, int... dat) {
         ByteBuf buf = Unpooled.buffer();
         buf.writeByte(id);
-        if ((id < 0 || channel == 0) && dat != null) {
+        if ((id < 0 || channel.getId() == 0) && dat != null) {
             for (int da : dat)
                 buf.writeInt(da);
         }
-        FMLProxyPacket pkt = new FMLProxyPacket(buf, CHAN[channel]);
+        FMLProxyPacket pkt = new FMLProxyPacket(buf, channel.name());
         pkt.setTarget(side);
         return pkt;
     }
@@ -138,7 +141,7 @@ public final class SkillPacketHandler {
                 buf.writeBoolean(dat[i].getBoolean());
             }
         }
-        FMLProxyPacket pkt = new FMLProxyPacket(buf, CHAN[3]);
+        FMLProxyPacket pkt = new FMLProxyPacket(buf, PacketChannel.LEVELUPCFG.name());
         pkt.setTarget(Side.CLIENT);
         return pkt;
     }
@@ -149,7 +152,7 @@ public final class SkillPacketHandler {
         for (int i = 0; i < dat.length; i++) {
             buf.writeByte(dat[i]);
         }
-        FMLProxyPacket pkt = new FMLProxyPacket(buf, CHAN[4]);
+        FMLProxyPacket pkt = new FMLProxyPacket(buf, PacketChannel.LEVELUPEXTPROP.name());
         pkt.setTarget(side);
         return pkt;
     }
@@ -160,7 +163,7 @@ public final class SkillPacketHandler {
         for (int i = 0; i < dat.length; i++) {
             buf.writeByte(dat[i]);
         }
-        FMLProxyPacket pkt = new FMLProxyPacket(buf, CHAN[5]);
+        FMLProxyPacket pkt = new FMLProxyPacket(buf, PacketChannel.LEVELUPOTHER.name());
         pkt.setTarget(side);
         return pkt;
     }

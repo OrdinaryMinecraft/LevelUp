@@ -15,10 +15,8 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
@@ -26,6 +24,8 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import ru.flametaichou.levelup.Handlers.*;
 import ru.flametaichou.levelup.Items.ItemFishingLootBox;
 import ru.flametaichou.levelup.Items.ItemRespecBook;
+import ru.flametaichou.levelup.Model.PacketChannel;
+import ru.flametaichou.levelup.Model.PlayerClass;
 
 import java.util.Arrays;
 import java.util.List;
@@ -54,17 +54,17 @@ public final class LevelUp {
         MinecraftForge.EVENT_BUS.register(BowEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(FightEventHandler.INSTANCE);
         SkillPacketHandler sk = new SkillPacketHandler();
-        initChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(SkillPacketHandler.CHAN[0]);
+        initChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(PacketChannel.LEVELUPINIT.name());
         initChannel.register(sk);
-        classChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(SkillPacketHandler.CHAN[1]);
+        classChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(PacketChannel.LEVELUPCLASSES.name());
         classChannel.register(sk);
-        skillChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(SkillPacketHandler.CHAN[2]);
+        skillChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(PacketChannel.LEVELUPSKILLS.name());
         skillChannel.register(sk);
-        configChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(SkillPacketHandler.CHAN[3]);
+        configChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(PacketChannel.LEVELUPCFG.name());
         configChannel.register(sk);
-        extPropertiesChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(SkillPacketHandler.CHAN[4]);
+        extPropertiesChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(PacketChannel.LEVELUPEXTPROP.name());
         extPropertiesChannel.register(sk);
-        otherChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(SkillPacketHandler.CHAN[5]);
+        otherChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(PacketChannel.LEVELUPOTHER.name());
         otherChannel.register(sk);
         proxy.registerGui();
     }
@@ -208,8 +208,8 @@ public final class LevelUp {
     // Smith class bonus
     public static void giveBonusSmeltingXP(EntityPlayer player) {
 	    if (bonusSmeltingXP) {
-	        byte pClass = PlayerExtendedProperties.getPlayerClass(player);
-	        if (pClass == 3) {
+	        PlayerClass pClass = PlayerExtendedProperties.getPlayerClass(player);
+	        if (pClass == PlayerClass.SMITH) {
 	            runBonusCounting(player, 1);
 	        }
 	    }
@@ -218,8 +218,8 @@ public final class LevelUp {
     // Hunter class bonus
     public static void giveBonusFightingXP(EntityPlayer player) {
         if (bonusFightingXP) {
-            byte pClass = PlayerExtendedProperties.getPlayerClass(player);
-            if (pClass == 8) {
+            PlayerClass pClass = PlayerExtendedProperties.getPlayerClass(player);
+            if (pClass == PlayerClass.HUNTER) {
                 player.addExperience(2);
             }
         }
@@ -227,8 +227,8 @@ public final class LevelUp {
 
     // Peasant class bonus
     public static void giveBonusFishingXP(EntityPlayer player) {
-        byte pClass = PlayerExtendedProperties.getPlayerClass(player);
-        if (pClass == 9) {
+        PlayerClass pClass = PlayerExtendedProperties.getPlayerClass(player);
+        if (pClass == PlayerClass.PEASANT) {
             player.addExperience(2);
         }
     }
@@ -236,8 +236,8 @@ public final class LevelUp {
     // Miner class bonus
     public static void giveBonusMiningXP(EntityPlayer player) {
         if (bonusMiningXP) {
-            byte pClass = PlayerExtendedProperties.getPlayerClass(player);
-            if (pClass == 1) {
+            PlayerClass pClass = PlayerExtendedProperties.getPlayerClass(player);
+            if (pClass == PlayerClass.MINER) {
                 runBonusCounting(player, 0);
             }
         }
@@ -245,9 +245,9 @@ public final class LevelUp {
     
     public static void giveBonusRandomXP(EntityPlayer player) {
     if (bonusRandomXP) {
-        byte pClass = PlayerExtendedProperties.getPlayerClass(player);
+        PlayerClass pClass = PlayerExtendedProperties.getPlayerClass(player);
         // Traveller class bonus
-        if (pClass == 10) {
+        if (pClass == PlayerClass.TRAVELLER) {
             player.addExperience(1);
        		}
     	}

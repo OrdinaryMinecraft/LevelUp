@@ -14,7 +14,9 @@ import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingSetAttackTargetEvent;
 import ru.flametaichou.levelup.LevelUp;
+import ru.flametaichou.levelup.Model.PlayerClass;
 import ru.flametaichou.levelup.PlayerExtendedProperties;
+import ru.flametaichou.levelup.Model.PlayerSkill;
 
 public final class FightEventHandler {
     public static final FightEventHandler INSTANCE = new FightEventHandler();
@@ -27,7 +29,7 @@ public final class FightEventHandler {
     public void onAttacked(LivingAttackEvent event) {
         DamageSource damagesource = event.source;
 
-        // air bars
+        // Air bars
     	if (damagesource.equals(DamageSource.drown)) {
     		if (event.entityLiving instanceof EntityPlayer) {
     			EntityPlayer player = (EntityPlayer) event.entityLiving;
@@ -52,9 +54,9 @@ public final class FightEventHandler {
 	            EntityPlayer entityplayer = (EntityPlayer) damagesource.getEntity();
                 EntityLivingBase victim = event.entityLiving;
 
-	            //Swordsman splash bonus
-                int playerClass = PlayerExtendedProperties.getPlayerClass(entityplayer);
-                if (playerClass == 2 && Math.random() <= 0.20 &&
+	            // Swordsman class bonus
+                PlayerClass playerClass = PlayerExtendedProperties.getPlayerClass(entityplayer);
+                if (playerClass == PlayerClass.SWORDSMAN && Math.random() <= 0.20 &&
                         (entityplayer.getHeldItem().getItem().getUnlocalizedName().contains("sword") || entityplayer.getHeldItem().getItem().getUnlocalizedName().contains("Sword"))) {
                     int radius = 1;
                     List e = victim.worldObj.getEntitiesWithinAABB(EntityLiving.class, AxisAlignedBB.getBoundingBox(victim.posX-radius, victim.posY-radius, victim.posZ-radius, (victim.posX + radius),(victim.posY + radius),(victim.posZ + radius)));
@@ -76,7 +78,7 @@ public final class FightEventHandler {
 	            if (LevelUp.debugMode) entityplayer.addChatComponentMessage(new ChatComponentTranslation("Damage without mod " + String.valueOf(i)));
 	            if (damagesource instanceof EntityDamageSourceIndirect) {
 	                if (damagesource.damageType.equals("arrow")) {
-                        i = i * (1.0F + BowEventHandler.getArcherSkill(entityplayer) / 100F);
+                        i = i * (1.0F + PlayerExtendedProperties.getSkill(entityplayer, PlayerSkill.ARCHERY) / 100F);
 	                }
 	                if (getDistance(event.entityLiving, entityplayer) < 256F && entityplayer.isSneaking() && !canSeePlayer(event.entityLiving) && !entityIsFacing(event.entityLiving, entityplayer)) {
 	                    i = i * 1.5F;
@@ -84,7 +86,7 @@ public final class FightEventHandler {
 	                }
 	            } else {
 	                if (entityplayer.getCurrentEquippedItem() != null) {
-	                    int j = getSwordSkill(entityplayer);
+	                    int j = PlayerExtendedProperties.getSkill(entityplayer, PlayerSkill.SWORDS);
 	                    if (entityplayer.getRNG().nextDouble() <= j / 200D) {
 	                        i *= 2.0F;
                             entityplayer.addChatComponentMessage(new ChatComponentTranslation("critical.attack", 2));
@@ -100,11 +102,11 @@ public final class FightEventHandler {
 
 
                 if (weapon.getTagCompound() != null) {
-                    //Smith damage bonus
+                    // Blacksmithing damage bonus
                     if (weapon.getTagCompound().getInteger("BonusDamage") != 0) {
                         i = i + weapon.getTagCompound().getInteger("BonusDamage");
                     }
-                    //Smith crit bonus
+                    // Blacksmithing crit bonus
                     if (weapon.getTagCompound().getInteger("BonusCrit") != 0)
                         if (Math.random() < (float) weapon.getTagCompound().getInteger("BonusCrit") / 100) {
                             i = i * 1.5F;
@@ -149,10 +151,10 @@ public final class FightEventHandler {
         
         if (event.entityLiving instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) event.entityLiving;
-            if (getDefenseSkill(player) != 0) {
-                int j = getDefenseSkill(player);
+            if (PlayerExtendedProperties.getSkill(player, PlayerSkill.SWORDS) != 0) {
+                int j = PlayerExtendedProperties.getSkill(player, PlayerSkill.VITALITY);
                 if (player.getRNG().nextDouble() <= j / 200D) {
-                	//heal
+                	// Heal
                 	if (player.getHealth() != player.getMaxHealth())
                 		player.setHealth(player.getHealth()+2);
 
@@ -173,14 +175,6 @@ public final class FightEventHandler {
                 ((EntityMob) event.entityLiving).setAttackTarget(null);
             }
         }
-    }
-
-    private static int getDefenseSkill(EntityPlayer player) {
-        return PlayerExtendedProperties.getSkillFromIndex(player, 2);
-    }
-
-    private int getSwordSkill(EntityPlayer player) {
-        return PlayerExtendedProperties.getSkillFromIndex(player, 1);
     }
 
     public static boolean canSeePlayer(EntityLivingBase entityLiving) {
@@ -219,7 +213,7 @@ public final class FightEventHandler {
         if (entityLiving == null || player == null) {
             return false;
         }
-        if (getDistance(entityLiving, player) > 256F - PlayerExtendedProperties.from(player).getSkillFromIndex("Sneaking") / 5 * 12.8F) {
+        if (getDistance(entityLiving, player) > 256F - PlayerExtendedProperties.from(player).getSkillFromIndex(PlayerSkill.SNEAKING) / 5 * 12.8F) {
             return false;
         }
         return entityLiving.canEntityBeSeen(player) && entityIsFacing(player, entityLiving);
