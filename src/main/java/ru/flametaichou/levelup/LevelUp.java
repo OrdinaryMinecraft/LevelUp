@@ -43,7 +43,7 @@ public final class LevelUp {
     private static Item xpTalisman;
     private static Item expOrb;
     private static Item respecBook;
-    public static Item iconHunter, iconThief, iconPeasant, iconSmith, iconSentinel, iconTraveller;
+    public static Item iconHunter, iconThief, iconPeasant, iconSmith, iconSentinel, iconTraveller, iconAthletics, iconHearth, iconSneaking, iconSwimming;
     public static Item fishingLootBox;
     public static FMLEventChannel initChannel, skillChannel, classChannel, configChannel, extPropertiesChannel, otherChannel;
 
@@ -210,5 +210,14 @@ public final class LevelUp {
         GameRegistry.registerItem(iconSentinel, "iconSentinel");
         iconTraveller = new Item().setUnlocalizedName("iconTraveller").setTextureName(ID + ":boots");
         GameRegistry.registerItem(iconTraveller, "iconTraveller");
+
+        iconAthletics = new Item().setUnlocalizedName("iconAthletics").setTextureName(ID + ":athletics");
+        GameRegistry.registerItem(iconAthletics, "iconAthletics");
+        iconHearth = new Item().setUnlocalizedName("iconHearth").setTextureName(ID + ":hearth");
+        GameRegistry.registerItem(iconHearth, "iconHearth");
+        iconSneaking = new Item().setUnlocalizedName("iconSneaking").setTextureName(ID + ":sneaking");
+        GameRegistry.registerItem(iconSneaking, "iconSneaking");
+        iconSwimming = new Item().setUnlocalizedName("iconSwimming").setTextureName(ID + ":swimming");
+        GameRegistry.registerItem(iconSwimming, "iconSwimming");
     }
 }

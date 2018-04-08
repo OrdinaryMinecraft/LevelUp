@@ -40,10 +40,11 @@ public class MobEventHandler {
 				EntityPlayer player = (EntityPlayer) event.source.getSourceOfDamage();
 				int bonus = PlayerExtendedProperties.getSkill(player, PlayerSkill.LOOTING);
 
+				// Looting skill bonus
 				// Добавляю бонусный лут в дроп
 				if (event.entity instanceof EntityMob && bonus > 0) {
 					double d = Math.random() * 100;
-					if (d < bonus) {
+					if (d <= bonus) {
 						count = random.nextInt(bonus / 5) + 1;
 						int index = random.nextInt(itemListLoot.size());
 						Item item = Item.getItemById(Integer.parseInt(itemListLoot.get(index)));
@@ -63,8 +64,9 @@ public class MobEventHandler {
 				// Удваиваем дроп. Только если моб - не из мода CustomNPCs
 				if (event.entity instanceof EntityMob && !event.entity.getClass().getName().contains("custom") && bonus / 5 > 0) {
 					double d = Math.random() * 100;
-					if (d < bonus / 5 * 5) {
+					if (d < bonus / 5) {
 						event.drops.clone();
+						player.addChatComponentMessage(new ChatComponentTranslation("drop.double"));
 					}
 				}
 

@@ -154,7 +154,7 @@ public final class PlayerEventHandler {
 
         if (event.useItem != Event.Result.DENY)
             /*
-            * Fishing skill
+            * Fishing skill bonus
             */
             if (event.action == Action.RIGHT_CLICK_AIR) {
                 EntityFishHook hook = event.entityPlayer.fishEntity;
@@ -468,8 +468,10 @@ public final class PlayerEventHandler {
                     ID = Items.melon_seeds;
                 }
             }
-            if (ID != null)
+            if (ID != null) {
                 event.world.spawnEntityInWorld(new EntityItem(event.world, event.x, event.y, event.z, new ItemStack(ID, 1, event.block.damageDropped(event.blockMetadata))));
+                event.getPlayer().addChatComponentMessage(new ChatComponentTranslation("farming.double"));
+            }
         }
     }
 

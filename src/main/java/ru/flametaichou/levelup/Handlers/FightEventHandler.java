@@ -73,8 +73,8 @@ public final class FightEventHandler {
                     }
                 }
 
-                //Swords skill
-                //Archery skill
+                //Swords skill bonus
+                //Archery skill bonus
                 ItemStack weapon = entityplayer.getHeldItem();
 	            if (damagesource instanceof EntityDamageSourceIndirect) {
 	                if (damagesource.damageType.equals("arrow")) {
@@ -119,7 +119,8 @@ public final class FightEventHandler {
 	            event.entityLiving.attackEntityFrom(damagesource, i-damage);
 	        }
         }
-        
+
+        // Vitality skill bonus
         if (event.entityLiving instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) event.entityLiving;
             if (PlayerExtendedProperties.getSkill(player, PlayerSkill.SWORDS) != 0) {
@@ -180,6 +181,7 @@ public final class FightEventHandler {
         return false;
     }
 
+    // Sneaking skill bonus
     public static boolean entityHasVisionOf(EntityLivingBase entityLiving, EntityPlayer player) {
         if (entityLiving == null || player == null) {
             return false;

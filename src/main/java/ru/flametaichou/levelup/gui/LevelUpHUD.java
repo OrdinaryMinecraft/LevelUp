@@ -1,20 +1,18 @@
-package ru.flametaichou.levelup;
+package ru.flametaichou.levelup.gui;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.client.event.FOVUpdateEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
-import ru.flametaichou.levelup.Handlers.FMLEventHandler;
 import ru.flametaichou.levelup.Handlers.PlayerEventHandler;
+import ru.flametaichou.levelup.LevelUp;
 import ru.flametaichou.levelup.Model.PlayerClass;
 import ru.flametaichou.levelup.Model.PlayerSkill;
+import ru.flametaichou.levelup.PlayerExtendedProperties;
 import ru.flametaichou.levelup.Util.ConfigHelper;
 
-import java.awt.*;
 import java.util.List;
 
 public final class LevelUpHUD extends Gui {

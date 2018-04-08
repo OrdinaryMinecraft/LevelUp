@@ -32,6 +32,8 @@ public final class ItemRespecBook extends Item {
     @Override
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack itemStack, EntityPlayer entityPlayer, List list, boolean isAdvanced) {
-        list.add(StatCollector.translateToLocal("respecbook.canresetclass"));
+        list.add(StatCollector.translateToLocal("item.respecBook.tooltip1"));
+        list.add(StatCollector.translateToLocal("item.respecBook.tooltip2"));
+        list.add(StatCollector.translateToLocal("item.respecBook.tooltip3"));
     }
 }

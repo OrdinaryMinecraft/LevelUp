@@ -98,8 +98,9 @@ public final class FMLEventHandler {
             if (!player.worldObj.isRemote && player.getCurrentEquippedItem() != null &&
                     player.getCurrentEquippedItem().getItem() instanceof ItemHoe &&
                     skill != 0 && player.getRNG().nextFloat() <= skill / 2500F) {
-                growCropsAround(player.worldObj, skill / 4, player);
+                growCropsAround(player.worldObj, skill / 2, player);
             }
+
             // Athletics skill bonus
             IAttributeInstance atinst = player.getEntityAttribute(SharedMonsterAttributes.movementSpeed);
             AttributeModifier mod;
@@ -131,7 +132,7 @@ public final class FMLEventHandler {
             }
 
             /*
-             * Fishing skill
+             * Fishing skill bonus
              */
             int skillFishing = PlayerExtendedProperties.getSkill(player, PlayerSkill.FISHING);
             if (skillFishing > 0)
@@ -181,7 +182,8 @@ public final class FMLEventHandler {
         for (int x = posX - dist; x < posX + dist + 1; x++) {
             for (int z = posZ - dist; z < posZ + dist + 1; z++) {
                 for (int y = posY - dist; y < posY + dist + 1; y++) {
-                	if (random.nextInt(3) == 1)
+                	//if (random.nextInt(3) == 1)
+                    if (Math.random() <= PlayerExtendedProperties.getSkill(player, PlayerSkill.FARMING) * 2)
                     if (world.isAirBlock(x, y + 1, z)) {
                         Block block = world.getBlock(x, y, z);
                         Integer blockid = Block.getIdFromBlock(block);
@@ -189,6 +191,7 @@ public final class FMLEventHandler {
                             Block soil = world.getBlock(x, y - 1, z);
                             if (!soil.isAir(world, x, y - 1, z) && soil.canSustainPlant(world, x, y - 1, z, ForgeDirection.UP, (IPlantable) block)) {
                                 ItemDye.applyBonemeal(new ItemStack(Items.dye, 1, 15), world, x, y, z, player);
+                                world.playAuxSFX(2005, x, y, z, 0);
                             }
                         }
                         break;

@@ -1,19 +1,16 @@
-package ru.flametaichou.levelup;
+package ru.flametaichou.levelup.gui;
 
-import com.sun.xml.internal.bind.v2.runtime.reflect.Lister;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
-import org.lwjgl.opengl.GL11;
 import ru.flametaichou.levelup.Handlers.SkillPacketHandler;
+import ru.flametaichou.levelup.LevelUp;
 import ru.flametaichou.levelup.Model.PacketChannel;
 import ru.flametaichou.levelup.Model.PlayerClass;
 import ru.flametaichou.levelup.Util.EnumUtils;
@@ -47,7 +44,7 @@ public final class GuiClasses extends GuiScreen {
             if (button.id != 0 && button.id != 100){
                 PlayerClass buttonClass = EnumUtils.getPlayerClassFromId(button.id);
                 mc.getTextureManager().bindTexture(texture);
-                drawTexturedModalRect(button.xPosition-24, button.yPosition-4, 0,0, 61, 30);
+                drawTexturedModalRect(button.xPosition-24, button.yPosition-4, 0,0, 61, 28);
                 mc.getTextureManager().bindTexture(TextureMap.locationItemsTexture);
                 drawTexturedModelRectFromIcon(button.xPosition-21, button.yPosition, buttonClass.getIcon(), 20, 20);
             }

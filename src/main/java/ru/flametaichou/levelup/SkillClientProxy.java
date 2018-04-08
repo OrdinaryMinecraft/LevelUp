@@ -5,6 +5,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.MinecraftForge;
 import ru.flametaichou.levelup.Handlers.SkillKeyHandler;
+import ru.flametaichou.levelup.gui.LevelUpHUD;
 
 @SuppressWarnings("UnusedDeclaration")
 public final class SkillClientProxy extends SkillProxy {

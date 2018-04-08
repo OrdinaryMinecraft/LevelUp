@@ -13,6 +13,9 @@ import net.minecraft.util.ChatComponentTranslation;
 import org.lwjgl.input.Keyboard;
 import ru.flametaichou.levelup.*;
 import ru.flametaichou.levelup.Model.PlayerClass;
+import ru.flametaichou.levelup.gui.GuiClasses;
+import ru.flametaichou.levelup.gui.GuiSkills;
+import ru.flametaichou.levelup.gui.LevelUpHUD;
 
 import java.util.ArrayList;
 import java.util.List;
