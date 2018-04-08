@@ -29,7 +29,7 @@ public final class BowEventHandler {
             if (arrow.shootingEntity instanceof EntityPlayer) {
                 EntityPlayer archer = (EntityPlayer) arrow.shootingEntity;
 
-                // Ускорение стрелы
+                // Arrow speedup
                 //int archerSkill = getArcherSkill(archer);
                 //if (archerSkill != 0) {
                 //    arrow.motionX *= 1.0F + archerSkill / 100F;

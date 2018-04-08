@@ -17,6 +17,7 @@ import ru.flametaichou.levelup.*;
 import ru.flametaichou.levelup.Model.ExtPropPacket;
 import ru.flametaichou.levelup.Model.PacketChannel;
 import ru.flametaichou.levelup.Model.PlayerSkill;
+import ru.flametaichou.levelup.Util.ConfigHelper;
 import ru.flametaichou.levelup.Util.EnumUtils;
 
 public final class SkillPacketHandler {
@@ -55,7 +56,6 @@ public final class SkillPacketHandler {
         PlayerExtendedProperties.from(entityPlayerMP).saveEffectData(packet.effectData);
         PlayerExtendedProperties.from(entityPlayerMP).saveDoubleShotCount(packet.doubleShotData);
         PlayerExtendedProperties.from(entityPlayerMP).saveLastSkillActivation(packet.skillCooldownData);
-        //FMLEventHandler.INSTANCE.loadPlayer(entityPlayerMP);
     }
 
     private void handleOtherPacket(FMLProxyPacket pckt, EntityPlayer entityPlayerMP) {
@@ -130,17 +130,10 @@ public final class SkillPacketHandler {
         return pkt;
     }
 
-    public static FMLProxyPacket getConfigPacket(Property... dat) {
+    public static FMLProxyPacket getConfigPacket(int[] dat) {
         ByteBuf buf = Unpooled.buffer();
-        for (int i = 0; i < dat.length; i++) {
-            if (i == 2) {
-                buf.writeDouble(dat[i].getDouble());
-            } else if (i < 4) {
-                buf.writeInt(dat[i].getInt());
-            } else {
-                buf.writeBoolean(dat[i].getBoolean());
-            }
-        }
+        buf.writeInt(dat[0]);
+        buf.writeInt(dat[1]);
         FMLProxyPacket pkt = new FMLProxyPacket(buf, PacketChannel.LEVELUPCFG.name());
         pkt.setTarget(Side.CLIENT);
         return pkt;
@@ -171,16 +164,9 @@ public final class SkillPacketHandler {
 
     private void handleConfig(FMLProxyPacket packet) {
         ByteBuf buf = packet.payload();
-        Property[] properties = LevelUp.instance.getServerProperties();
-        for (int i = 0; i < properties.length; i++) {
-            if (i == 2) {
-                properties[i].set(buf.readDouble());
-            } else if (i < 4) {
-                properties[i].set(buf.readInt());
-            } else {
-                properties[i].set(buf.readBoolean());
-            }
-        }
-        LevelUp.instance.useServerProperties();
+        int[] properties = ConfigHelper.getServerProperties();
+        properties[0] = buf.readInt();
+        properties[1] = buf.readInt();
+        ConfigHelper.useServerProperties(properties);
     }
 }

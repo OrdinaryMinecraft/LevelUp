@@ -34,9 +34,13 @@ public final class GuiClasses extends GuiScreen {
     public void drawScreen(int i, int j, float f) {
         drawDefaultBackground();
         this.text.drawTextBox();
-        drawString(fontRendererObj, StatCollector.translateToLocal("class." + pClass.name() + ".tooltip1"), this.text.xPosition+3, this.text.yPosition+3, 0xffffff);
-        drawString(fontRendererObj, StatCollector.translateToLocal("class." + pClass.name() + ".tooltip2"), this.text.xPosition+3, this.text.yPosition+15, 0xffffff);
-        drawString(fontRendererObj, StatCollector.translateToLocal("class." + pClass.name() + ".tooltip3"), this.text.xPosition+3, this.text.yPosition+27, 0xffffff);
+        if (pClass == PlayerClass.NONE) {
+            drawString(fontRendererObj, StatCollector.translateToLocalFormatted("gui.class.tooltip"), this.text.xPosition + 3, this.text.yPosition + 3, 0xffffff);
+        } else {
+            drawString(fontRendererObj, StatCollector.translateToLocal("class." + pClass.name() + ".tooltip1"), this.text.xPosition + 3, this.text.yPosition + 3, 0xffffff);
+            drawString(fontRendererObj, StatCollector.translateToLocal("class." + pClass.name() + ".tooltip2"), this.text.xPosition + 3, this.text.yPosition + 15, 0xffffff);
+            drawString(fontRendererObj, StatCollector.translateToLocal("class." + pClass.name() + ".tooltip3"), this.text.xPosition + 3, this.text.yPosition + 27, 0xffffff);
+        }
         drawCenteredString(fontRendererObj, StatCollector.translateToLocalFormatted("gui.class.title", StatCollector.translateToLocal("class." + pClass.name() + ".name")), width / 2, height / 6 + 174, 0xffffff);
         for (Object obj : buttonList) {
             GuiButton button = (GuiButton) obj;
@@ -95,6 +99,11 @@ public final class GuiClasses extends GuiScreen {
             mc.displayGuiScreen(null);
             mc.setIngameFocus();
         } else {
+            for (Object obj : buttonList) {
+                GuiButton button = (GuiButton) obj;
+                button.enabled = true;
+            }
+            guibutton.enabled = false;
             pClass = EnumUtils.getPlayerClassFromId(guibutton.id);
             //text.setText(StatCollector.translateToLocal("class." + pClass.name() + ".tooltip"));
         }

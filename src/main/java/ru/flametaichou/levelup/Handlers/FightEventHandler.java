@@ -17,6 +17,7 @@ import ru.flametaichou.levelup.LevelUp;
 import ru.flametaichou.levelup.Model.PlayerClass;
 import ru.flametaichou.levelup.PlayerExtendedProperties;
 import ru.flametaichou.levelup.Model.PlayerSkill;
+import ru.flametaichou.levelup.Util.ConfigHelper;
 
 public final class FightEventHandler {
     public static final FightEventHandler INSTANCE = new FightEventHandler();
@@ -75,7 +76,6 @@ public final class FightEventHandler {
                 //Swords skill
                 //Archery skill
                 ItemStack weapon = entityplayer.getHeldItem();
-	            if (LevelUp.debugMode) entityplayer.addChatComponentMessage(new ChatComponentTranslation("Damage without mod " + String.valueOf(i)));
 	            if (damagesource instanceof EntityDamageSourceIndirect) {
 	                if (damagesource.damageType.equals("arrow")) {
                         i = i * (1.0F + PlayerExtendedProperties.getSkill(entityplayer, PlayerSkill.ARCHERY) / 100F);
@@ -113,41 +113,12 @@ public final class FightEventHandler {
                             entityplayer.addChatComponentMessage(new ChatComponentTranslation("critical.attack", 1.5));
                         }
                 }
-	            if (LevelUp.debugMode) entityplayer.addChatComponentMessage(new ChatComponentTranslation("Damage with mod " + String.valueOf(i)));
 	        }
-	        /*
-	         * Defense Skill
-	         * 
-	         * if (event.entityLiving instanceof EntityPlayer) {
-	            EntityPlayer player = (EntityPlayer) event.entityLiving;
-	            if (LevelUp.debugMode) player.addChatComponentMessage(new ChatComponentTranslation("Damage taken without mod " + String.valueOf(i)));
-	            int j = getDefenseSkill(player);
-	            player.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(player.getMaxHealth() + 2);
-	            if (!damagesource.isUnblockable()) {
-	                //i *= 1.0F - j / 5 / 20F;
-	                i *= 1.0F - j / 100F;
-	            }
-	            if (player.isBlocking() && player.getRNG().nextFloat() < j / 100F) {
-	                i *= 0F;
-	            }
-	            if (LevelUp.debugMode) player.addChatComponentMessage(new ChatComponentTranslation("Damage taken with mod " + String.valueOf(i)));
-	        }
-	        */
-	        
-	        //if ((i >= event.entityLiving.getHealth()) && (!event.isCanceled())) {
-	        	//event.entityLiving.setHealth(1);
-	        	//event.entityLiving.onDeath(damagesource);
-	        //	event.ammount = event.entityLiving.getHealth();
-	        //}
-	        //else {
-	        	//event.ammount = i;
-	        //}
 	        if (damagesource.getEntity() instanceof EntityPlayer) {
 	        	damagesource.setMagicDamage();
 	            event.entityLiving.attackEntityFrom(damagesource, i-damage);
 	        }
         }
-    	//event.entityLiving.setHealth(event.entityLiving.getHealth()-i);
         
         if (event.entityLiving instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) event.entityLiving;

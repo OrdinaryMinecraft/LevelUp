@@ -11,6 +11,7 @@ import ru.flametaichou.levelup.Handlers.SkillPacketHandler;
 import ru.flametaichou.levelup.Model.ExtPropPacket;
 import ru.flametaichou.levelup.Model.PlayerClass;
 import ru.flametaichou.levelup.Model.PlayerSkill;
+import ru.flametaichou.levelup.Util.ConfigHelper;
 import ru.flametaichou.levelup.Util.EnumUtils;
 
 import java.util.HashMap;
@@ -239,8 +240,8 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
             if (skill == PlayerSkill.EXP)
                 continue;
             int j = skillMap.get(skill);
-            if (j > ClassBonus.getMaxSkillPoints()) {
-                skillMap.put(skill, ClassBonus.getMaxSkillPoints());
+            if (j > ConfigHelper.maxSkillPoints) {
+                skillMap.put(skill, ConfigHelper.maxSkillPoints);
             }
         }
     }

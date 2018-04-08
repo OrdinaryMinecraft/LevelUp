@@ -4,19 +4,20 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.util.IIcon;
+import ru.flametaichou.levelup.LevelUp;
 
 public enum PlayerClass {
     // ids must be unique and ordered
     NONE(0, null, null, null, Items.coal),
     MINER(1, PlayerSkill.MINING, PlayerSkill.BLACKSMITHING, PlayerSkill.VITALITY, Items.iron_pickaxe),
     SWORDSMAN(2, PlayerSkill.SWORDS, PlayerSkill.VITALITY, PlayerSkill.ATHLETICS, Items.iron_sword),
-    SMITH(3, PlayerSkill.BLACKSMITHING, PlayerSkill.MINING, PlayerSkill.VITALITY, Items.iron_ingot),
+    SMITH(3, PlayerSkill.BLACKSMITHING, PlayerSkill.MINING, PlayerSkill.VITALITY, LevelUp.iconSmith),
     MARKSMAN(4, PlayerSkill.ARCHERY, PlayerSkill.SNEAKING, PlayerSkill.ATHLETICS, Items.bow),
-    HUNTER(5, PlayerSkill.LOOTING, PlayerSkill.SWORDS, PlayerSkill.ARCHERY, Items.bow),
-    PEASANT(6, PlayerSkill.FARMING, PlayerSkill.FISHING, PlayerSkill.SWIMMING, Items.iron_hoe),
-    TRAVELLER(7, PlayerSkill.ATHLETICS, PlayerSkill.SWIMMING, PlayerSkill.VITALITY, Items.golden_boots),
-    THIEF(8, PlayerSkill.SNEAKING, PlayerSkill.LOOTING, PlayerSkill.ATHLETICS, Items.gold_nugget),
-    SENTINEL(9, PlayerSkill.VITALITY, PlayerSkill.SWORDS, PlayerSkill.ARCHERY, Items.iron_chestplate);
+    HUNTER(5, PlayerSkill.LOOTING, PlayerSkill.SWORDS, PlayerSkill.ARCHERY, LevelUp.iconHunter),
+    PEASANT(6, PlayerSkill.FARMING, PlayerSkill.FISHING, PlayerSkill.SWIMMING, LevelUp.iconPeasant),
+    TRAVELLER(7, PlayerSkill.ATHLETICS, PlayerSkill.SWIMMING, PlayerSkill.VITALITY, LevelUp.iconTraveller),
+    THIEF(8, PlayerSkill.SNEAKING, PlayerSkill.LOOTING, PlayerSkill.ATHLETICS, LevelUp.iconThief),
+    SENTINEL(9, PlayerSkill.VITALITY, PlayerSkill.SWORDS, PlayerSkill.ARCHERY, LevelUp.iconSentinel);
     private final int id;
     private final PlayerSkill skill1, skill2, skill3;
     private IIcon icon;

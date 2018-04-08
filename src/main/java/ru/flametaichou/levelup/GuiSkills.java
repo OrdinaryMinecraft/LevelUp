@@ -9,6 +9,7 @@ import ru.flametaichou.levelup.Handlers.SkillPacketHandler;
 import ru.flametaichou.levelup.Model.PacketChannel;
 import ru.flametaichou.levelup.Model.PlayerClass;
 import ru.flametaichou.levelup.Model.PlayerSkill;
+import ru.flametaichou.levelup.Util.ConfigHelper;
 import ru.flametaichou.levelup.Util.EnumUtils;
 
 public final class GuiSkills extends GuiScreen {
@@ -20,7 +21,6 @@ public final class GuiSkills extends GuiScreen {
 
     @Override
     protected void actionPerformed(GuiButton guibutton) {
-        System.out.println(guibutton.id);
         if (guibutton.id == 0) {
             closedWithButton = true;
             mc.displayGuiScreen(null);
@@ -30,7 +30,7 @@ public final class GuiSkills extends GuiScreen {
             mc.displayGuiScreen(null);
             mc.setIngameFocus();
         } else if (guibutton.id < skills.length) {
-            if (getSkillOffset(PlayerSkill.EXP.getId()) > 0 && getSkillOffset(guibutton.id) < ClassBonus.getMaxSkillPoints()) {
+            if (getSkillOffset(PlayerSkill.EXP.getId()) > 0 && getSkillOffset(guibutton.id) < ConfigHelper.maxSkillPoints) {
                 skills[guibutton.id]++;
                 skills[PlayerSkill.EXP.getId()]--;
             }

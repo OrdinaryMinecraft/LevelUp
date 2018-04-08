@@ -30,6 +30,7 @@ import ru.flametaichou.levelup.*;
 import ru.flametaichou.levelup.Model.PacketChannel;
 import ru.flametaichou.levelup.Model.PlayerClass;
 import ru.flametaichou.levelup.Model.PlayerSkill;
+import ru.flametaichou.levelup.Util.ConfigHelper;
 import ru.flametaichou.levelup.Util.WorldUtils;
 
 public final class FMLEventHandler {
@@ -91,15 +92,7 @@ public final class FMLEventHandler {
     			PlayerExtendedProperties.from(player).sendAirData(bonus / 5);
     			flagSetCounter = true;
     		}
-   
-            // Give points on levelup
-            if (PlayerExtendedProperties.getPlayerClass(player) != PlayerClass.NONE && player.isEntityAlive()) {
-                double diff = PlayerEventHandler.xpPerLevel * (player.experienceLevel - PlayerEventHandler.minLevel) + ClassBonus.getBonusPoints() - PlayerExtendedProperties.from(player).getSkillPoints();
-                if (diff >= 1.0D) {
-                    PlayerExtendedProperties.from(player).addToSkill(PlayerSkill.EXP, (int) Math.floor(diff));
-                }
-            }
-            
+
             // Farming skill bonus
             int skill = PlayerExtendedProperties.getSkill(player, PlayerSkill.FARMING);
             if (!player.worldObj.isRemote && player.getCurrentEquippedItem() != null &&
@@ -171,7 +164,7 @@ public final class FMLEventHandler {
         }
     }
     
-    public void removeEffects (EntityPlayer player) {
+    public void removeEffects(EntityPlayer player) {
     	for (int i = 0; i < negativeEffects.length; i++) {
     		player.removePotionEffect(negativeEffects[i]);
     	}
@@ -277,7 +270,7 @@ public final class FMLEventHandler {
      * Vitality skill bonus
      * Increase HP
      */
-    public void updatePlayerHP (EntityPlayer player) {
+    public void updatePlayerHP(EntityPlayer player) {
     	int skill = PlayerExtendedProperties.getSkill(player, PlayerSkill.VITALITY);
         player.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(20 + (2 * skill / 5));
     }
@@ -289,7 +282,7 @@ public final class FMLEventHandler {
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.player instanceof EntityPlayerMP) {
             loadPlayer(event.player);
-            LevelUp.configChannel.sendTo(SkillPacketHandler.getConfigPacket(LevelUp.instance.getServerProperties()), (EntityPlayerMP) event.player);
+            LevelUp.configChannel.sendTo(SkillPacketHandler.getConfigPacket(ConfigHelper.getServerProperties()), (EntityPlayerMP) event.player);
             updatePlayerHP(event.player);
         }
     }
