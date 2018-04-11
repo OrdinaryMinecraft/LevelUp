@@ -30,7 +30,8 @@ public class ItemExpOrb extends Item {
     @Override
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack itemStack, EntityPlayer entityPlayer, List list, boolean isAdvanced) {
-        list.add(StatCollector.translateToLocal("item.expOrb.tooltip"));
+        list.add(StatCollector.translateToLocal("item.expOrb.tooltip1"));
+        list.add(StatCollector.translateToLocal("item.expOrb.tooltip2"));
     }
 }
 

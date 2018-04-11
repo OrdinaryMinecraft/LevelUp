@@ -98,6 +98,14 @@ public final class FMLEventHandler {
             if (!player.worldObj.isRemote && player.getCurrentEquippedItem() != null &&
                     player.getCurrentEquippedItem().getItem() instanceof ItemHoe &&
                     skill != 0 && player.getRNG().nextFloat() <= skill / 2500F) {
+                // Ломаем мотыгу
+                ItemStack item = player.getHeldItem();
+                int damage = item.getItemDamage();
+                //item.damageItem(1, event.entityPlayer);
+                if (!player.capabilities.isCreativeMode) {
+                    if (item.isItemStackDamageable())
+                        item.setItemDamage(damage+1);
+                }
                 growCropsAround(player.worldObj, skill / 2, player);
             }
 
@@ -183,7 +191,7 @@ public final class FMLEventHandler {
             for (int z = posZ - dist; z < posZ + dist + 1; z++) {
                 for (int y = posY - dist; y < posY + dist + 1; y++) {
                 	//if (random.nextInt(3) == 1)
-                    if (Math.random() <= PlayerExtendedProperties.getSkill(player, PlayerSkill.FARMING) * 2)
+                    if (Math.random() * 100 <= PlayerExtendedProperties.getSkill(player, PlayerSkill.FARMING))
                     if (world.isAirBlock(x, y + 1, z)) {
                         Block block = world.getBlock(x, y, z);
                         Integer blockid = Block.getIdFromBlock(block);

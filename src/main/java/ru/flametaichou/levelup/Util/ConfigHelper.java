@@ -56,7 +56,7 @@ public class ConfigHelper {
     }
 
     public static int[] getServerProperties() {
-        int[] result = new int[2];
+        int[] result = new int[3];
         result[0] = maxSkillPoints;
         result[1] = resetSkillOnDeath;
         if (resetClassOnDeath)

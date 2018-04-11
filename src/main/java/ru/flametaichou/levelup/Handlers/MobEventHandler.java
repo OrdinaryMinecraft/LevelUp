@@ -75,6 +75,7 @@ public class MobEventHandler {
                 if (event.entity instanceof EntityAnimal && pClass == PlayerClass.HUNTER) {
                     if (Math.random() < 0.15) {
                         event.drops.clone();
+						player.addChatComponentMessage(new ChatComponentTranslation("drop.double"));
                     }
                 }
 			}
