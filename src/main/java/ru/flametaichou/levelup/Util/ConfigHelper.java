@@ -25,6 +25,7 @@ public class ConfigHelper {
     public static int resetSkillOnDeath;
     public static boolean respecBookRecipe;
     public static boolean xpTalismanRecipe;
+    public static boolean resetClassOnDeath;
 
 
     private static void setupConfig(Configuration config) {
@@ -44,6 +45,7 @@ public class ConfigHelper {
             resetSkillOnDeath = config.getInt("resetSkillOnDeath", "Settings", 0, 0,100,"How much skill points will gone on death (percent).");
             respecBookRecipe = config.getBoolean("respecBookRecipe", "Items", false, "Add recipe to craft Respec Book.");
             xpTalismanRecipe = config.getBoolean("xpTalismanRecipe", "Items", false,"Add recipe to craft XP Talisman.");
+            resetClassOnDeath = config.getBoolean("resetClassOnDeath", "Settings", false,"Reset player class on death?");
         } catch(Exception e) {
             System.out.println("A severe error has occured when attempting to load the config file for this mod!");
         } finally {
@@ -57,12 +59,20 @@ public class ConfigHelper {
         int[] result = new int[2];
         result[0] = maxSkillPoints;
         result[1] = resetSkillOnDeath;
+        if (resetClassOnDeath)
+            result[2] = 1;
+        else
+            result[2] = 0;
         return result;
     }
 
     public static void useServerProperties(int[] properties) {
         maxSkillPoints = properties[0];
         resetSkillOnDeath = properties[1];
+        if (properties[2] == 1)
+            resetClassOnDeath = true;
+        else if (properties[2] == 0)
+            resetClassOnDeath = false;
     }
 
     public static void loadConfig(Configuration config) {

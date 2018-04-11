@@ -26,7 +26,7 @@ public final class LevelUpHUD extends Gui {
                 left.add(StatCollector.translateToLocalFormatted("hud.skill.text2", StatCollector.translateToLocal("class." + playerClass + ".name")) + " (очки умений: " + skillXP + ")");
             else
             	left.add(StatCollector.translateToLocalFormatted("hud.skill.text2", StatCollector.translateToLocal("class." + playerClass + ".name")));
-        } else if (canSelectClass()) {
+        } else {
             left.add(StatCollector.translateToLocal("hud.skill.select"));
         }
     }
@@ -53,15 +53,6 @@ public final class LevelUpHUD extends Gui {
                 event.newfov *=  1/(1.0F + skill / 100F);
                 event.newfov += 0.5F;
             }
-        }
-    }
-
-    public static boolean canSelectClass() {
-        if (LevelUp.proxy.getPlayer().experienceLevel >= PlayerEventHandler.minLevel)
-            return true;
-        else {
-            int points = PlayerExtendedProperties.from(LevelUp.proxy.getPlayer()).getSkillPoints();
-            return points > PlayerEventHandler.minLevel * PlayerEventHandler.xpPerLevel || points > ConfigHelper.maxSkillPoints;
         }
     }
 

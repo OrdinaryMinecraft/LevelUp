@@ -26,15 +26,10 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
     private int fireShotCount;
     private int latestExp;
     private Map<PlayerSkill, Integer> skillMap = new HashMap<PlayerSkill, Integer>();
-    private Map<String, int[]> counterMap = new HashMap<String, int[]>();
-    public final static String[] counters = {"ore", "craft", "bonus"};
 
     public PlayerExtendedProperties() {
         for (PlayerSkill skill : PlayerSkill.values())
             skillMap.put(skill, 0);
-        counterMap.put(counters[0], new int[]{0, 0, 0, 0});
-        counterMap.put(counters[1], new int[]{0, 0, 0, 0});
-        counterMap.put(counters[2], new int[]{0, 0, 0});//ore bonus, craft bonus, kill bonus
     }
 
     @Override
@@ -47,9 +42,6 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
         compound.setInteger("FireShotCount", fireShotCount);
         for (PlayerSkill skill : PlayerSkill.values()) {
             compound.setInteger(skill.name(), skillMap.get(skill));
-        }
-        for (String cat : counters) {
-            compound.setIntArray(cat, counterMap.get(cat));
         }
     }
 
@@ -176,9 +168,6 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
         for (PlayerSkill skill : PlayerSkill.values()) {
             skillMap.put(skill, compound.getInteger(skill.name()));
         }
-        for (String cat : counters) {
-            counterMap.put(cat, compound.getIntArray(cat));
-        }
     }
 
     @Override
@@ -228,10 +217,6 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
         }
     }
 
-    public static Map<String, int[]> getCounterMap(EntityPlayer player) {
-        return from(player).counterMap;
-    }
-
     /**
      * Проверяет, не превышен ли лимит прокачки навыков
      */
@@ -246,7 +231,7 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
         }
     }
 
-    public void takeSkillPointsFromPlayer(float ratio) {
+    public void takeSkillPointsFromPlayer(int ratio) {
         final PlayerClass pClass = playerClass;
         if (pClass != PlayerClass.NONE) {
             ClassBonus.applyBonus(this, pClass, PlayerClass.NONE);
@@ -254,7 +239,7 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
         }
         for (PlayerSkill skill : PlayerSkill.values()) {
             final int value = skillMap.get(skill);
-            int remove = (int) (value * ratio);
+            int remove = (value * ratio) / 100;
             if (remove > 0) {
                 skillMap.put(skill, value - remove);
             }

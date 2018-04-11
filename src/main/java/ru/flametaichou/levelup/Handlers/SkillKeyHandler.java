@@ -35,8 +35,9 @@ public final class SkillKeyHandler {
         if (keyGui.getIsKeyPressed() && Minecraft.getMinecraft().currentScreen == null && Minecraft.getMinecraft().thePlayer != null) {
             if (LevelUpHUD.canShowSkills()) {
                 Minecraft.getMinecraft().displayGuiScreen(new GuiSkills());
-            } else if (LevelUpHUD.canSelectClass())
+            } else {
                 Minecraft.getMinecraft().displayGuiScreen(new GuiClasses());
+            }
         }
         if (keyActivate.getIsKeyPressed() && Minecraft.getMinecraft().currentScreen == null && Minecraft.getMinecraft().thePlayer != null) {
 

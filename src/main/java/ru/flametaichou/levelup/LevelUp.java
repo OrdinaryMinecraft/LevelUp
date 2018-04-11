@@ -96,7 +96,7 @@ public final class LevelUp {
     public static void giveBonusSmeltingXP(EntityPlayer player) {
         PlayerClass pClass = PlayerExtendedProperties.getPlayerClass(player);
         if (pClass == PlayerClass.SMITH) {
-            runBonusCounting(player, 1);
+            player.addExperience(1);
         }
     }
 
@@ -117,10 +117,10 @@ public final class LevelUp {
     }
 
     // Miner class bonus
-    public static void giveBonusMiningXP(EntityPlayer player) {
+    public static void giveBonusMiningXP(EntityPlayer player, int exp) {
         PlayerClass pClass = PlayerExtendedProperties.getPlayerClass(player);
         if (pClass == PlayerClass.MINER) {
-            runBonusCounting(player, 0);
+            player.addExperience(exp);
         }
     }
     
@@ -135,47 +135,11 @@ public final class LevelUp {
     		player.addExperience(2);
    		}
     }
-
-    private static void runBonusCounting(EntityPlayer player, int type) {
-        Map<String, int[]> counters = PlayerExtendedProperties.getCounterMap(player);
-        int[] bonus = counters.get(PlayerExtendedProperties.counters[2]);
-        if (bonus == null || bonus.length == 0) {
-            bonus = new int[]{0, 0, 0};
-        }
-        if (bonus[type] < 4) {
-            bonus[type]++;
-        } else {
-            bonus[type] = 0;
-            player.addExperience(2);
-        }
-        counters.put(PlayerExtendedProperties.counters[2], bonus);
-    }
-
-    public static void incrementOreCounter(EntityPlayer player, int i) {
-        Map<String, int[]> counters = PlayerExtendedProperties.getCounterMap(player);
-        int[] ore = counters.get(PlayerExtendedProperties.counters[0]);
-        if (ore.length <= i) {
-            int[] orenew = new int[i + 1];
-            System.arraycopy(ore, 0, orenew, 0, ore.length);
-            counters.put(PlayerExtendedProperties.counters[0], orenew);
-            ore = orenew;
-        }
-        ore[i]++;
-        float f = (float) Math.pow(2D, 3 - i) / 2.0F;
-        boolean flag;
-        for (flag = false; f <= ore[i]; f += 0.5F) {
-            player.addExperience(1);
-            flag = true;
-        }
-        if (flag) {
-            ore[i] = 0;
-        }
-        counters.put(PlayerExtendedProperties.counters[0], ore);
-        giveBonusMiningXP(player);
-    }
     
 	public static void takenFromSmelting(EntityPlayer player, ItemStack smelting) {
-        giveBonusSmeltingXP(player);
+        for (int i = 0; i < smelting.stackSize; i++) {
+            giveBonusSmeltingXP(player);
+        }
 	}
 
     private void registerItems() {

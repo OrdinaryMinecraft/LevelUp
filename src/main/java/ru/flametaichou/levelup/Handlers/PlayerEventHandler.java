@@ -37,6 +37,7 @@ import ru.flametaichou.levelup.LevelUp;
 import ru.flametaichou.levelup.Model.PlayerClass;
 import ru.flametaichou.levelup.Model.PlayerSkill;
 import ru.flametaichou.levelup.PlayerExtendedProperties;
+import ru.flametaichou.levelup.Util.ConfigHelper;
 
 import java.util.*;
 
@@ -46,41 +47,9 @@ public final class PlayerEventHandler {
      */
     public static boolean oldSpeedDigging = true, oldSpeedRedstone = true;
     /**
-     * Configurable flags related to player death
-     */
-    public static float resetSkillOnDeath = 1.00F;
-    public static boolean resetClassOnDeath = false;
-    /**
-     * If duplicated ores can be placed
-     */
-    public static boolean noPlaceDuplicate = true;
-    /**
-     * How much each level give in skill points
-     */
-    public static double xpPerLevel = 3.0D;
-    /**
-     * Level at which a player can choose a class, and get its first skill points
-     */
-    public final static int minLevel = 0;
-    /**
      * Random additional loot for Fishing
      */
     private static List<String> bonusFishingLootList;
-    /**
-     * Internal ore counter
-     */
-    private static Map<Block, Integer> blockToCounter = new IdentityHashMap<Block, Integer>();
-
-    static {
-        blockToCounter.put(Blocks.coal_ore, 0);
-        blockToCounter.put(Blocks.lapis_ore, 1);
-        blockToCounter.put(Blocks.redstone_ore, 2);
-        blockToCounter.put(Blocks.iron_ore, 3);
-        blockToCounter.put(Blocks.gold_ore, 4);
-        blockToCounter.put(Blocks.emerald_ore, 5);
-        blockToCounter.put(Blocks.diamond_ore, 6);
-        blockToCounter.put(Blocks.quartz_ore, 7);
-    }
 
     /**
      * Items given by Digging ground
@@ -121,11 +90,11 @@ public final class PlayerEventHandler {
     public void onDeath(LivingDeathEvent event) {
         if (event.entityLiving instanceof EntityPlayer) {
         	//resetPlayerHP((EntityPlayer) event.entityLiving);
-            if (resetClassOnDeath) {
+            if (ConfigHelper.resetClassOnDeath) {
                 PlayerExtendedProperties.from((EntityPlayer) event.entityLiving).setPlayerClass(PlayerClass.NONE);
             }
-            if (resetSkillOnDeath > 0.00F) {
-                PlayerExtendedProperties.from((EntityPlayer) event.entityLiving).takeSkillPointsFromPlayer(resetSkillOnDeath);
+            if (ConfigHelper.resetSkillOnDeath > 0) {
+                PlayerExtendedProperties.from((EntityPlayer) event.entityLiving).takeSkillPointsFromPlayer(ConfigHelper.resetSkillOnDeath);
             }
         } else if (event.entityLiving instanceof EntityMob && event.source.getEntity() instanceof EntityPlayer) {
             LevelUp.giveBonusFightingXP((EntityPlayer) event.source.getEntity());
@@ -224,7 +193,7 @@ public final class PlayerEventHandler {
 //                    }
 //                    event.useItem = Event.Result.DENY;
                 }
-            } else if (event.action == Action.RIGHT_CLICK_BLOCK && noPlaceDuplicate && !event.world.isRemote) {
+            } else if (event.action == Action.RIGHT_CLICK_BLOCK && !event.world.isRemote) {
                 ItemStack itemStack = event.entityPlayer.inventory.getCurrentItem();
                 if (itemStack != null && itemStack.hasTagCompound() && itemStack.getTagCompound().hasKey("NoPlacing")) {
                 	//event.useItem = Event.Result.DENY;
@@ -245,12 +214,11 @@ public final class PlayerEventHandler {
             int skill;
             Random random = event.harvester.getRNG();
             if (event.block instanceof BlockOre || event.block instanceof BlockRedstoneOre || ores.contains(event.block)) {
+
+                int expDrop = event.block.getExpDrop(event.world, event.blockMetadata, event.fortuneLevel);
+                LevelUp.giveBonusMiningXP(event.harvester, expDrop / 3);
+
                 skill = getSkill(event.harvester, PlayerSkill.MINING);
-                if (!blockToCounter.containsKey(event.block)) {
-                    blockToCounter.put(event.block, blockToCounter.size());
-                }
-                if (!event.isSilkTouching)
-                    LevelUp.incrementOreCounter(event.harvester, blockToCounter.get(event.block));
                 if (random.nextDouble() <= skill / 200D) {
                     boolean foundBlock = false;
                     for (ItemStack stack : event.drops) {
@@ -408,12 +376,8 @@ public final class PlayerEventHandler {
         }
     }
 
-    /**
-     * Convenience method to write the "no-placement" flag onto a block
-     */
+    // write "NoPlacing" flag onto a block to prevent dupes
     private void writeNoPlacing(ItemStack toDrop) {
-        if (!noPlaceDuplicate)
-            return;
         NBTTagCompound tagCompound = toDrop.getTagCompound();
         if (tagCompound == null)
             tagCompound = new NBTTagCompound();
@@ -494,7 +458,7 @@ public final class PlayerEventHandler {
      */
     @SubscribeEvent
     public void onPlayerClone(PlayerEvent.Clone event) {
-        if (!event.wasDeath || !resetClassOnDeath || resetSkillOnDeath < 1.00F) {
+        if (!event.wasDeath || !ConfigHelper.resetClassOnDeath || ConfigHelper.resetSkillOnDeath < 100) {
             NBTTagCompound data = new NBTTagCompound();
             PlayerExtendedProperties.from(event.original).saveNBTData(data);
             PlayerExtendedProperties.from(event.entityPlayer).loadNBTData(data);
