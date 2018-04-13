@@ -77,6 +77,15 @@ public final class FMLEventHandler {
                 if (WorldUtils.isNight(event.player.worldObj) && PlayerExtendedProperties.getPlayerClass(player) == PlayerClass.HUNTER) {
                     player.addPotionEffect(new PotionEffect(Potion.nightVision.id, 250, 0, true));
                 }
+                // Thief class bonus
+                if (PlayerExtendedProperties.getPlayerClass(player) == PlayerClass.THIEF && player.isSneaking()) {
+                    // if (!player.worldObj.isDaytime() || !player.worldObj.canBlockSeeTheSky((int) player.posX, (int) player.posY, (int) player.posZ)) {
+                    if (player.worldObj.getBlockLightValue((int) player.posX, (int) player.posY, (int) player.posZ) <= 7) {
+                        if (!player.isInvisible())
+                            player.worldObj.playSoundEffect(player.posX, player.posY, player.posZ, "mob.enderdragon.wings", 1.1F, 1.1F);
+                        player.addPotionEffect(new PotionEffect(Potion.invisibility.id, 80, 0, true));
+                    }
+                }
             }
 
             // Swimming skill bonus

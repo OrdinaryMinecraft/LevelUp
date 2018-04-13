@@ -6,10 +6,16 @@ import cpw.mods.fml.common.gameevent.InputEvent;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
 import org.lwjgl.input.Keyboard;
 import ru.flametaichou.levelup.*;
 import ru.flametaichou.levelup.Model.PlayerClass;
@@ -103,6 +109,34 @@ public final class SkillKeyHandler {
                 if (playerClass == PlayerClass.SWORDSMAN) {
                     FMLProxyPacket packet = SkillPacketHandler.getOtherPacket(Side.SERVER, "swordsmanBuff");
                     LevelUp.otherChannel.sendToServer(packet);
+                }
+
+                // Thief class bonus
+                if (playerClass == PlayerClass.THIEF) {
+                    // Find entity or block player looking at
+                    MovingObjectPosition objectMouseOver = Minecraft.getMinecraft().objectMouseOver;
+                    if (objectMouseOver != null) {
+                        if (objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
+                            if (objectMouseOver.entityHit instanceof EntityPlayer) {
+                                EntityPlayer victim = (EntityPlayer) objectMouseOver.entityHit;
+                                // Steal from player
+                                System.out.print("player");
+                                FMLProxyPacket packet = SkillPacketHandler.getOtherPacket(Side.SERVER, "steal/player/" + victim.getDisplayName());
+                                LevelUp.otherChannel.sendToServer(packet);
+                            }
+                        } else if (objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+                            TileEntity te = player.worldObj.getTileEntity(objectMouseOver.blockX, objectMouseOver.blockY, objectMouseOver.blockZ);
+                            if (te != null) {
+                                // if (block instanceof BlockContainer || block instanceof IInventory)
+                                if (te instanceof IInventory) {
+                                    // Steal from container
+                                    System.out.print("block");
+                                    FMLProxyPacket packet = SkillPacketHandler.getOtherPacket(Side.SERVER, "steal/block/" + objectMouseOver.blockX + "/" + objectMouseOver.blockY + "/" + objectMouseOver.blockZ);
+                                    LevelUp.otherChannel.sendToServer(packet);
+                                }
+                            }
+                        }
+                    }
                 }
 
                 PlayerExtendedProperties.from(player).sendLastSkillActivation(player.worldObj.getTotalWorldTime());

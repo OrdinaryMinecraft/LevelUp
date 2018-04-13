@@ -7,11 +7,20 @@ import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraftforge.common.config.Property;
 import ru.flametaichou.levelup.*;
 import ru.flametaichou.levelup.Model.ExtPropPacket;
@@ -20,7 +29,11 @@ import ru.flametaichou.levelup.Model.PlayerSkill;
 import ru.flametaichou.levelup.Util.ConfigHelper;
 import ru.flametaichou.levelup.Util.EnumUtils;
 
+import java.util.Random;
+
 public final class SkillPacketHandler {
+
+    private Random random = new Random();
 
     @SubscribeEvent
     public void onServerPacket(FMLNetworkEvent.ServerCustomPacketEvent event) {
@@ -73,6 +86,45 @@ public final class SkillPacketHandler {
             String[] parts = packetString.split("/");
             entityPlayerMP.addExperienceLevel(Integer.parseInt(parts[1]));
             entityPlayerMP.worldObj.playSoundEffect(entityPlayerMP.posX, entityPlayerMP.posY, entityPlayerMP.posZ, "random.levelup", 1.5F, 1.5F);
+        } else if (packetString.contains("steal")) {
+            System.out.print(packetString);
+            String[] parts = packetString.split("/");
+            if (parts[1].equals("player")) {
+                // Steam from player
+                EntityPlayer victim = entityPlayerMP.worldObj.getPlayerEntityByName(parts[2]);
+                int inventorySlots = victim.inventory.mainInventory.length;
+                int slot = random.nextInt(inventorySlots);
+                ItemStack stealingItem = victim.inventory.mainInventory[slot];
+                // more than 10 secs after attack to steal
+                if (stealingItem != null && Math.random() <= 0.2 && stealingItem.isStackable() && !victim.capabilities.isCreativeMode && victim.getLastAttackerTime() > 200) {
+                    victim.inventory.consumeInventoryItem(stealingItem.getItem());
+                    entityPlayerMP.inventory.addItemStackToInventory(new ItemStack(stealingItem.getItem(), 1));
+                    entityPlayerMP.addChatComponentMessage(new ChatComponentTranslation("stealing.player.success", stealingItem.getItem().getItemStackDisplayName(stealingItem)));
+                    entityPlayerMP.worldObj.playSoundEffect(entityPlayerMP.posX, entityPlayerMP.posY, entityPlayerMP.posZ, "mob.irongolem.throw", 1.5F, 1.5F);
+                } else {
+                    entityPlayerMP.addChatComponentMessage(new ChatComponentTranslation("stealing.player.fail"));
+                    victim.addChatComponentMessage(new ChatComponentTranslation("stealing.player.victim", entityPlayerMP.getDisplayName()));
+                    entityPlayerMP.worldObj.playSoundEffect(entityPlayerMP.posX, entityPlayerMP.posY, entityPlayerMP.posZ, "mob.chicken.hurt", 1.2F, 1.2F);
+                }
+            } else if (parts[1].equals("block")) {
+                // Steam from block
+                IInventory container = (IInventory) entityPlayerMP.worldObj.getTileEntity(Integer.parseInt(parts[2]), Integer.parseInt(parts[3]), Integer.parseInt(parts[4]));
+                System.out.print(container);
+                Integer inventorySlots = container.getSizeInventory();
+                int slot = random.nextInt(inventorySlots);
+                ItemStack stealingItem = container.getStackInSlot(slot);
+                // 20%
+                if (stealingItem != null && Math.random() <= 0.2 && stealingItem.isStackable()) {
+                    container.decrStackSize(slot, 1);
+                    entityPlayerMP.inventory.addItemStackToInventory(new ItemStack(stealingItem.getItem(), 1));
+                    entityPlayerMP.addChatComponentMessage(new ChatComponentTranslation("stealing.block.success", stealingItem.getItem().getItemStackDisplayName(stealingItem)));
+                    entityPlayerMP.worldObj.playSoundEffect(entityPlayerMP.posX, entityPlayerMP.posY, entityPlayerMP.posZ, "mob.irongolem.throw", 1.5F, 1.5F);
+                } else {
+                    entityPlayerMP.addChatComponentMessage(new ChatComponentTranslation("stealing.block.fail"));
+                    entityPlayerMP.worldObj.playSoundEffect(entityPlayerMP.posX, entityPlayerMP.posY, entityPlayerMP.posZ, "random.chestclosed", 1.0F, 1.0F);
+                }
+
+            }
         }
     }
 
