@@ -9,6 +9,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.*;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -41,6 +42,16 @@ public final class FightEventHandler {
                     player.addChatComponentMessage(new ChatComponentTranslation("water.count", PlayerExtendedProperties.from(player).loadAirData()));
                     }
                 }
+        }
+
+        // Traveller class bonus
+        if (damagesource.equals(DamageSource.starve)) {
+            if (event.entityLiving instanceof EntityPlayer) {
+                EntityPlayer player = (EntityPlayer) event.entityLiving;
+                if (PlayerExtendedProperties.getPlayerClass(player) == PlayerClass.TRAVELLER) {
+                    player.addPotionEffect(new PotionEffect(23, 6, 0, true));
+                }
+            }
         }
     }
 
@@ -124,7 +135,7 @@ public final class FightEventHandler {
         // Vitality skill bonus
         if (event.entityLiving instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) event.entityLiving;
-            if (PlayerExtendedProperties.getSkill(player, PlayerSkill.SWORDS) != 0) {
+            if (PlayerExtendedProperties.getSkill(player, PlayerSkill.VITALITY) != 0) {
                 int j = PlayerExtendedProperties.getSkill(player, PlayerSkill.VITALITY);
                 if (player.getRNG().nextDouble() <= j / 200D) {
                 	// Heal

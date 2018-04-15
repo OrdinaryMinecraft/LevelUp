@@ -150,6 +150,10 @@ public final class SkillPacketHandler {
             entityPlayerMP.worldObj.playSoundEffect(entityPlayerMP.posX, entityPlayerMP.posY, entityPlayerMP.posZ, "mob.irongolem.death", 1.2F, 1.2F);
         } else if (packetString.equals("minerBuff")) {
             entityPlayerMP.worldObj.playSoundEffect(entityPlayerMP.posX, entityPlayerMP.posY, entityPlayerMP.posZ, "note.pling", 1.2F, 1.2F);
+        } else if (packetString.equals("travellerBuff")) {
+            entityPlayerMP.addPotionEffect(new PotionEffect(Potion.moveSpeed.id, 300, 2, true));
+            entityPlayerMP.addPotionEffect(new PotionEffect(Potion.jump.id, 300, 1, true));
+            entityPlayerMP.worldObj.playSoundEffect(entityPlayerMP.posX, entityPlayerMP.posY, entityPlayerMP.posZ, "fireworks.launch", 1.5F, 1.5F);
         }
     }
 
@@ -245,6 +249,7 @@ public final class SkillPacketHandler {
         properties[0] = buf.readInt();
         properties[1] = buf.readInt();
         properties[2] = buf.readInt();
+        properties[3] = buf.readInt();
         ConfigHelper.useServerProperties(properties);
     }
 }

@@ -155,6 +155,12 @@ public final class SkillKeyHandler {
                         LevelUp.otherChannel.sendToServer(packet);
                     }
 
+                    // Traveller class bonus
+                    if (playerClass == PlayerClass.TRAVELLER) {
+                        FMLProxyPacket packet = SkillPacketHandler.getOtherPacket(Side.SERVER, "travellerBuff");
+                        LevelUp.otherChannel.sendToServer(packet);
+                    }
+
                     PlayerExtendedProperties.from(player).sendLastSkillActivation(player.worldObj.getTotalWorldTime());
                 } else {
                     long timeDiff = player.worldObj.getTotalWorldTime() - PlayerExtendedProperties.from(player).loadLastSkillActivation();

@@ -129,7 +129,7 @@ public final class LevelUp {
         // Traveller class bonus
         if (pClass == PlayerClass.TRAVELLER) {
             player.addExperience(1);
-       		}
+        }
 
     	if (player.inventory.hasItem(xpTalisman)) {
     		player.addExperience(2);
