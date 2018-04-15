@@ -2,9 +2,6 @@ package ru.flametaichou.levelup.Model;
 
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.IIcon;
 import ru.flametaichou.levelup.LevelUp;
 
 public enum PlayerSkill {
@@ -22,18 +19,18 @@ public enum PlayerSkill {
     BLACKSMITHING(11, LevelUp.iconSmith);
 
     private final int id;
-    private IIcon icon;
+    private Item icon;
 
     private PlayerSkill(int id, Item item) {
         this.id = id;
-        this.icon = item.getIconFromDamage(0);
+        this.icon = item;
     }
 
     public int getId() {
         return this.id;
     }
 
-    public IIcon getIcon() {
+    public Item getIcon() {
         return icon;
     }
 }

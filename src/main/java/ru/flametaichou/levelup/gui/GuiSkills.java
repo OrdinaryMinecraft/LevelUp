@@ -15,6 +15,7 @@ import ru.flametaichou.levelup.Model.PlayerSkill;
 import ru.flametaichou.levelup.PlayerExtendedProperties;
 import ru.flametaichou.levelup.Util.ConfigHelper;
 import ru.flametaichou.levelup.Util.EnumUtils;
+import ru.flametaichou.levelup.Util.PlayerUtils;
 
 public final class GuiSkills extends GuiScreen {
     private boolean closedWithButton;
@@ -81,7 +82,7 @@ public final class GuiSkills extends GuiScreen {
             mc.getTextureManager().bindTexture(texture);
             drawTexturedModalRect(xPosition, yPosition, 0, 32, 50, 24);
             mc.getTextureManager().bindTexture(TextureMap.locationItemsTexture);
-            drawTexturedModelRectFromIcon(xPosition + 2, yPosition + 2, EnumUtils.getPlayerSkillFromId(x + 1).getIcon(), 20, 20);
+            drawTexturedModelRectFromIcon(xPosition + 2, yPosition + 2, PlayerUtils.getIcon(EnumUtils.getPlayerSkillFromId(x + 1).getIcon()), 20, 20);
             drawCenteredString(fontRendererObj, StatCollector.translateToLocal("skill." + EnumUtils.getPlayerSkillFromId(x + 1) + ".name"), xPosition + 85, yPosition, 0xffffff);
 
 
@@ -95,7 +96,7 @@ public final class GuiSkills extends GuiScreen {
             mc.getTextureManager().bindTexture(texture);
             drawTexturedModalRect(xPosition, yPosition, 0, 32, 50, 24);
             mc.getTextureManager().bindTexture(TextureMap.locationItemsTexture);
-            drawTexturedModelRectFromIcon(xPosition + 28, yPosition + 2, EnumUtils.getPlayerSkillFromId(x + 1).getIcon(), 20, 20);
+            drawTexturedModelRectFromIcon(xPosition + 28, yPosition + 2, PlayerUtils.getIcon(EnumUtils.getPlayerSkillFromId(x + 1).getIcon()), 20, 20);
             drawCenteredString(fontRendererObj, StatCollector.translateToLocal("skill." + EnumUtils.getPlayerSkillFromId(x + 1) + ".name"), xPosition - 35, yPosition, 0xffffff);
         }
         String s = "";

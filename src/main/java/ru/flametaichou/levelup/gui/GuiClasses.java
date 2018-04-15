@@ -14,6 +14,7 @@ import ru.flametaichou.levelup.LevelUp;
 import ru.flametaichou.levelup.Model.PacketChannel;
 import ru.flametaichou.levelup.Model.PlayerClass;
 import ru.flametaichou.levelup.Util.EnumUtils;
+import ru.flametaichou.levelup.Util.PlayerUtils;
 
 public final class GuiClasses extends GuiScreen {
     private boolean closedWithButton = false;
@@ -46,7 +47,7 @@ public final class GuiClasses extends GuiScreen {
                 mc.getTextureManager().bindTexture(texture);
                 drawTexturedModalRect(button.xPosition-24, button.yPosition-4, 0,0, 61, 28);
                 mc.getTextureManager().bindTexture(TextureMap.locationItemsTexture);
-                drawTexturedModelRectFromIcon(button.xPosition-21, button.yPosition, buttonClass.getIcon(), 20, 20);
+                drawTexturedModelRectFromIcon(button.xPosition-21, button.yPosition, PlayerUtils.getIcon(buttonClass.getIcon()), 20, 20);
             }
 
         }

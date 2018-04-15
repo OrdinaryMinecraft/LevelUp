@@ -33,7 +33,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-@Mod(modid = LevelUp.ID, name = "Level Up! (Ordinary Edition)", version = "${version}")
+@Mod(modid = LevelUp.ID, name = "Level Up! (Ordinary Edition)", version = "2.0")
 public final class LevelUp {
     public final static String ID = "levelup";
     @Instance(value = ID)

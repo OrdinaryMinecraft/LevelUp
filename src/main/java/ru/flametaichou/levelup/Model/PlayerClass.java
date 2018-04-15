@@ -1,6 +1,5 @@
 package ru.flametaichou.levelup.Model;
 
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.util.IIcon;
@@ -20,14 +19,14 @@ public enum PlayerClass {
     SENTINEL(9, PlayerSkill.VITALITY, PlayerSkill.SWORDS, PlayerSkill.ARCHERY, LevelUp.iconSentinel);
     private final int id;
     private final PlayerSkill skill1, skill2, skill3;
-    private IIcon icon;
+    private Item icon;
 
     private PlayerClass(int id, PlayerSkill skill1, PlayerSkill skill2, PlayerSkill skill3, Item item) {
         this.id = id;
         this.skill1 = skill1;
         this.skill2 = skill2;
         this.skill3 = skill3;
-        this.icon = item.getIconFromDamage(0);
+        this.icon = item;
     }
 
     public int getId() {
@@ -50,7 +49,7 @@ public enum PlayerClass {
         return this == NONE;
     }
 
-    public IIcon getIcon() {
+    public Item getIcon() {
         return icon;
     }
 }

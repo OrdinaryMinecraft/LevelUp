@@ -250,6 +250,7 @@ public final class SkillPacketHandler {
         properties[1] = buf.readInt();
         properties[2] = buf.readInt();
         properties[3] = buf.readInt();
+        properties[4] = buf.readInt();
         ConfigHelper.useServerProperties(properties);
     }
 }

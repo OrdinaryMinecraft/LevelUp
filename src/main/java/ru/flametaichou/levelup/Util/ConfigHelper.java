@@ -27,6 +27,7 @@ public class ConfigHelper {
     public static boolean resetClassOnDeath;
     public static boolean resetSkillsOnDeath;
     public static int percentSkillOnDeath;
+    public static int activeSkillCooldown;
 
 
     private static void setupConfig(Configuration config) {
@@ -44,6 +45,7 @@ public class ConfigHelper {
 
             maxSkillPoints = config.getInt("maxSkillPoints", "Settings", 30, 10,50,"Max skill points for each skill.");
             percentSkillOnDeath = config.getInt("percentSkillOnDeath", "Settings", 0, 0,100,"How much skill points will gone on death (percent).");
+            activeSkillCooldown = config.getInt("activeSkillCooldown", "Settings", 120, 0,9999,"Class active skill cooldown (seconds).");
             respecBookRecipe = config.getBoolean("respecBookRecipe", "Items", false, "Add recipe to craft Respec Book.");
             xpTalismanRecipe = config.getBoolean("xpTalismanRecipe", "Items", false,"Add recipe to craft XP Talisman.");
             resetClassOnDeath = config.getBoolean("resetClassOnDeath", "Settings", false,"Reset player class on death?");
@@ -58,7 +60,7 @@ public class ConfigHelper {
     }
 
     public static int[] getServerProperties() {
-        int[] result = new int[4];
+        int[] result = new int[5];
         result[0] = maxSkillPoints;
         result[1] = percentSkillOnDeath;
         if (resetClassOnDeath)
@@ -69,6 +71,7 @@ public class ConfigHelper {
             result[3] = 1;
         else
             result[3] = 0;
+        result[4] = activeSkillCooldown;
         return result;
     }
 
@@ -83,6 +86,7 @@ public class ConfigHelper {
             resetSkillsOnDeath = true;
         else if (properties[3] == 0)
             resetSkillsOnDeath = false;
+        activeSkillCooldown = properties[4];
     }
 
     public static void loadConfig(Configuration config) {
