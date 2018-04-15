@@ -93,8 +93,11 @@ public final class PlayerEventHandler {
             if (ConfigHelper.resetClassOnDeath) {
                 PlayerExtendedProperties.from((EntityPlayer) event.entityLiving).setPlayerClass(PlayerClass.NONE);
             }
-            if (ConfigHelper.resetSkillOnDeath > 0) {
-                PlayerExtendedProperties.from((EntityPlayer) event.entityLiving).takeSkillPointsFromPlayer(ConfigHelper.resetSkillOnDeath);
+            if (ConfigHelper.resetSkillsOnDeath) {
+                PlayerExtendedProperties.from((EntityPlayer) event.entityLiving).convertSkillsToSkillPoints(false);
+            }
+            if (ConfigHelper.percentSkillOnDeath > 0) {
+                PlayerExtendedProperties.from((EntityPlayer) event.entityLiving).takeSkillPointsFromPlayer(ConfigHelper.percentSkillOnDeath);
             }
         } else if (event.entityLiving instanceof EntityMob && event.source.getEntity() instanceof EntityPlayer) {
             LevelUp.giveBonusFightingXP((EntityPlayer) event.source.getEntity());
@@ -458,7 +461,7 @@ public final class PlayerEventHandler {
      */
     @SubscribeEvent
     public void onPlayerClone(PlayerEvent.Clone event) {
-        if (!event.wasDeath || !ConfigHelper.resetClassOnDeath || ConfigHelper.resetSkillOnDeath < 100) {
+        if (!event.wasDeath || !ConfigHelper.resetClassOnDeath || ConfigHelper.percentSkillOnDeath < 100) {
             NBTTagCompound data = new NBTTagCompound();
             PlayerExtendedProperties.from(event.original).saveNBTData(data);
             PlayerExtendedProperties.from(event.entityPlayer).loadNBTData(data);

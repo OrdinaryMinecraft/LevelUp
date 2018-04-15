@@ -31,6 +31,7 @@ import ru.flametaichou.levelup.Model.PacketChannel;
 import ru.flametaichou.levelup.Model.PlayerClass;
 import ru.flametaichou.levelup.Model.PlayerSkill;
 import ru.flametaichou.levelup.Util.ConfigHelper;
+import ru.flametaichou.levelup.Util.PlayerUtils;
 import ru.flametaichou.levelup.Util.WorldUtils;
 
 public final class FMLEventHandler {
@@ -68,13 +69,13 @@ public final class FMLEventHandler {
                 PlayerExtendedProperties.from(player).sendEffectData(false);
             }
 
-            if (player.worldObj.getWorldTime() % 50 == 0) {
+            if (player.worldObj.getWorldTime() % 50 == 0 && !player.worldObj.isRemote) {
                 // Miner class bonus
-                if (player.posY < 50 && PlayerExtendedProperties.getPlayerClass(player) == PlayerClass.MINER) {
+                if (PlayerExtendedProperties.getPlayerClass(player) == PlayerClass.MINER && player.posY < 50) {
                     player.addPotionEffect(new PotionEffect(Potion.digSpeed.id, 80, 0, true));
                 }
                 // Hunter class bonus
-                if (WorldUtils.isNight(event.player.worldObj) && PlayerExtendedProperties.getPlayerClass(player) == PlayerClass.HUNTER) {
+                if (PlayerExtendedProperties.getPlayerClass(player) == PlayerClass.HUNTER && WorldUtils.isNight(event.player.worldObj)) {
                     player.addPotionEffect(new PotionEffect(Potion.nightVision.id, 250, 0, true));
                 }
                 // Thief class bonus
@@ -85,6 +86,10 @@ public final class FMLEventHandler {
                             player.worldObj.playSoundEffect(player.posX, player.posY, player.posZ, "mob.enderdragon.wings", 1.1F, 1.1F);
                         player.addPotionEffect(new PotionEffect(Potion.invisibility.id, 80, 0, true));
                     }
+                }
+                // Sentinel class bonus
+                if (PlayerExtendedProperties.getPlayerClass(player) == PlayerClass.SENTINEL && PlayerUtils.timeAfterLastAttack(player) > 600) {
+                    player.addPotionEffect(new PotionEffect(22, 200, 1, true));
                 }
             }
 

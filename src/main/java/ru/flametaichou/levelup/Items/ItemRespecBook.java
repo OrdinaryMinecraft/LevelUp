@@ -2,7 +2,6 @@ package ru.flametaichou.levelup.Items;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -21,7 +20,7 @@ public final class ItemRespecBook extends Item {
     @Override
     public ItemStack onItemRightClick(ItemStack itemstack, World world, EntityPlayer entityplayer) {
         if (!world.isRemote) {
-            PlayerExtendedProperties.from(entityplayer).convertPointsToXp(true);
+            PlayerExtendedProperties.from(entityplayer).convertSkillsToSkillPoints(true);
             FMLEventHandler.INSTANCE.loadPlayer(entityplayer);
         }
         if (!entityplayer.capabilities.isCreativeMode)

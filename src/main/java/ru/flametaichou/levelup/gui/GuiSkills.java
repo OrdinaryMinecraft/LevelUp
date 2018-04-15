@@ -60,7 +60,19 @@ public final class GuiSkills extends GuiScreen {
         else {
             drawCenteredString(fontRendererObj, StatCollector.translateToLocalFormatted("hud.skill.text2", StatCollector.translateToLocal("class." + pClass.name() + ".name")), width / 2, 2, 0xffffff);
         }
-        // x < 4 - количество строк
+        // Draw white lines
+        for (int x = 0; x < 6; x++) {
+
+            int xPosition = width / 2 - offset - 50;
+            int yPosition = 20 + 32 * x;
+
+            mc.getTextureManager().bindTexture(texture);
+            if (x != 5)
+                drawTexturedModalRect(xPosition + 40, yPosition + 10, 0, 58, 160, 35);
+            else
+                drawTexturedModalRect(xPosition + 40, yPosition + 10, 0, 58, 81, 35);
+        }
+        // Draw first column
         for (int x = 0; x < 6; x++) {
 
             int xPosition = width / 2 - offset - 50;
@@ -68,16 +80,13 @@ public final class GuiSkills extends GuiScreen {
 
             mc.getTextureManager().bindTexture(texture);
             drawTexturedModalRect(xPosition, yPosition, 0, 32, 50, 24);
-            if (x != 5)
-                drawTexturedModalRect(xPosition + 40, yPosition + 10, 0, 58, 160, 35);
-            else
-                drawTexturedModalRect(xPosition + 40, yPosition + 10, 0, 58, 81, 35);
             mc.getTextureManager().bindTexture(TextureMap.locationItemsTexture);
             drawTexturedModelRectFromIcon(xPosition + 2, yPosition + 2, EnumUtils.getPlayerSkillFromId(x + 1).getIcon(), 20, 20);
             drawCenteredString(fontRendererObj, StatCollector.translateToLocal("skill." + EnumUtils.getPlayerSkillFromId(x + 1) + ".name"), xPosition + 85, yPosition, 0xffffff);
 
 
         }
+        // Draw second column
         for (int x = 6; x < 11; x++) {
 
             int xPosition = width / 2 + offset;
@@ -144,6 +153,7 @@ public final class GuiSkills extends GuiScreen {
         buttonList.add(new GuiButton(100, width / 2 - 192, height / 6 + 168, 96, 20, StatCollector.translateToLocal("gui.cancel")));
         buttonList.add(new GuiButton(101, width / 2 - 24, height / 6 + 164, 48, 20, StatCollector.translateToLocal("gui.reset")));
 
+        // Draw first column
         for (int index = 0; index < 6; index++) {
             int xPosition = width / 2 - offset - 50;
             int yPosition = 20 + 32 * index;
@@ -151,6 +161,7 @@ public final class GuiSkills extends GuiScreen {
             buttonList.add(new GuiButton(1 + index, xPosition + 28, yPosition + 2, 20, 20, skillOffset.toString()));
 
         }
+        // Draw second column
         for (int index = 6; index < 11; index++) {
             int xPosition = width / 2 + offset;
             int yPosition = 20 + 32 * (index - 6);

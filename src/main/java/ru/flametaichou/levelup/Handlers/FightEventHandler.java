@@ -37,7 +37,7 @@ public final class FightEventHandler {
                 if (PlayerExtendedProperties.from(player).loadAirData() > 0) {
                 	event.setCanceled(true);
                 	player.setAir(300);
-                	PlayerExtendedProperties.from(player).sendAirData(PlayerExtendedProperties.from(player).loadAirData()-1);
+                	PlayerExtendedProperties.from(player).sendAirData(PlayerExtendedProperties.from(player).loadAirData() - 1);
                     player.addChatComponentMessage(new ChatComponentTranslation("water.count", PlayerExtendedProperties.from(player).loadAirData()));
                     }
                 }
@@ -58,6 +58,7 @@ public final class FightEventHandler {
 	            // Swordsman class bonus
                 PlayerClass playerClass = PlayerExtendedProperties.getPlayerClass(entityplayer);
                 if (playerClass == PlayerClass.SWORDSMAN && Math.random() <= 0.20 &&
+                        entityplayer.getHeldItem() != null &&
                         (entityplayer.getHeldItem().getItem().getUnlocalizedName().contains("sword") || entityplayer.getHeldItem().getItem().getUnlocalizedName().contains("Sword"))) {
                     int radius = 1;
                     List e = victim.worldObj.getEntitiesWithinAABB(EntityLiving.class, AxisAlignedBB.getBoundingBox(victim.posX-radius, victim.posY-radius, victim.posZ-radius, (victim.posX + radius),(victim.posY + radius),(victim.posZ + radius)));
@@ -101,7 +102,7 @@ public final class FightEventHandler {
 	            }
 
 
-                if (weapon.getTagCompound() != null) {
+                if (weapon != null && weapon.getTagCompound() != null) {
                     // Blacksmithing damage bonus
                     if (weapon.getTagCompound().getInteger("BonusDamage") != 0) {
                         i = i + weapon.getTagCompound().getInteger("BonusDamage");

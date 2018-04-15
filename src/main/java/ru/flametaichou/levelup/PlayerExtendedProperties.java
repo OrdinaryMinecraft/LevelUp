@@ -251,11 +251,12 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
         capSkills();
     }
 
-    public void convertPointsToXp(boolean resetClass) {
+    public void convertSkillsToSkillPoints(boolean resetClass) {
         final PlayerClass pClass = playerClass;
         setPlayerClass(PlayerClass.NONE);
-        skillMap.put(PlayerSkill.EXP, getSkillPoints());
-        setPlayerData(new int[PlayerSkill.EXP.getId()]);
+        int skillPoints = getSkillPoints();
+        setPlayerData(new int[PlayerSkill.values().length]);
+        skillMap.put(PlayerSkill.EXP, skillPoints);
         if (!resetClass)
             setPlayerClass(pClass);
     }
