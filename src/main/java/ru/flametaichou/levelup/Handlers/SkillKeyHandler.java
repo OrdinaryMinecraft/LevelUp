@@ -16,8 +16,10 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
+import net.minecraftforge.oredict.OreDictionary;
 import org.lwjgl.input.Keyboard;
 import ru.flametaichou.levelup.*;
+import ru.flametaichou.levelup.Model.OreCount;
 import ru.flametaichou.levelup.Model.PlayerClass;
 import ru.flametaichou.levelup.Util.ConfigHelper;
 import ru.flametaichou.levelup.gui.GuiClasses;
@@ -78,22 +80,36 @@ public final class SkillKeyHandler {
                         int ore_y = 0;
                         int ore_z = 0;
                         String block_name = "";
+                        List<OreCount> ores = new ArrayList<OreCount>();
                         for (int x = player_x - radius; x <= player_x + radius; x++) {
                             for (int y = player_y - radius; y <= player_y + radius; y++) {
                                 for (int z = player_z - radius; z <= player_z + radius; z++) {
                                     Block block = player.worldObj.getBlock(x, y, z);
-                                    if (block.getUnlocalizedName().contains("ore") || block.getUnlocalizedName().contains("Ore")) {
-                                        blocks.add(block);
-                                        abs_x = Math.abs(player_x - x);
-                                        abs_y = Math.abs(player_y - y);
-                                        abs_z = Math.abs(player_z - z);
-                                        dist = abs_x + abs_y + abs_z;
-                                        if (dist < min_dist) {
-                                            min_dist = dist;
-                                            ore_x = x;
-                                            ore_y = y;
-                                            ore_z = z;
-                                            block_name = block.getLocalizedName();
+                                    String[] parts = block.getUnlocalizedName().toLowerCase().split("\\.");
+                                    for (String part : parts) {
+                                        if (part.startsWith("ore") || part.endsWith("ore")) {
+                                            boolean flagAdd = false;
+                                            for (OreCount ore : ores) {
+                                                if (block.getLocalizedName().equals(ore.getOreName())) {
+                                                    ore.setCount(ore.getCount() + 1);
+                                                    flagAdd = true;
+                                                }
+                                            }
+                                            if (!flagAdd) {
+                                                ores.add(new OreCount(block.getLocalizedName(), 1));
+                                            }
+                                            blocks.add(block);
+                                            abs_x = Math.abs(player_x - x);
+                                            abs_y = Math.abs(player_y - y);
+                                            abs_z = Math.abs(player_z - z);
+                                            dist = abs_x + abs_y + abs_z;
+                                            if (dist < min_dist) {
+                                                min_dist = dist;
+                                                ore_x = x;
+                                                ore_y = y;
+                                                ore_z = z;
+                                                block_name = block.getLocalizedName();
+                                            }
                                         }
                                     }
                                 }
@@ -106,8 +122,12 @@ public final class SkillKeyHandler {
                         if (blocks.isEmpty())
                             player.addChatComponentMessage(new ChatComponentTranslation("miner.ores.none"));
                         else {
+                            player.addChatComponentMessage(new ChatComponentTranslation("miner.ores.total"));
+                            for (OreCount ore : ores) {
+                                player.addChatComponentMessage(new ChatComponentTranslation("· " + ore.getOreName() + " (" + ore.getCount() + ")"));
+                            }
                             player.addChatComponentMessage(new ChatComponentTranslation("miner.ores.ore"));
-                            player.addChatComponentMessage(new ChatComponentTranslation("X:" + ore_x + " Y:" + ore_y + " Z:" + ore_z + " (" + block_name + ")"));
+                            player.addChatComponentMessage(new ChatComponentTranslation("· X:" + ore_x + " Y:" + ore_y + " Z:" + ore_z + " (" + block_name + ")"));
                         }
                     }
 
@@ -137,6 +157,7 @@ public final class SkillKeyHandler {
                                 }
                             } else if (objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
                                 TileEntity te = player.worldObj.getTileEntity(objectMouseOver.blockX, objectMouseOver.blockY, objectMouseOver.blockZ);
+                                Block block = player.worldObj.getBlock(objectMouseOver.blockX, objectMouseOver.blockY, objectMouseOver.blockZ);
                                 if (te != null) {
                                     // if (block instanceof BlockContainer || block instanceof IInventory)
                                     if (te instanceof IInventory) {

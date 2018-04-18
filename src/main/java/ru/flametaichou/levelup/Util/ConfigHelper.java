@@ -8,7 +8,6 @@ import ru.flametaichou.levelup.Items.ItemFishingLootBox;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 
 public class ConfigHelper {
 
@@ -20,6 +19,7 @@ public class ConfigHelper {
     public static List<String> itemRareList;
     public static List<String> itemFishingList;
     public static List<String> itemFishingLB;
+    public static List<String> stealBlackList;
 
     public static int maxSkillPoints;
     public static boolean respecBookRecipe;
@@ -42,6 +42,7 @@ public class ConfigHelper {
             itemRareList = Arrays.asList(config.getStringList("Item for looting (rare)", "Lists", new String[]{"264","388","372","384"}, "Rare items dropping from mobs and looted from chests."));
             itemFishingList = Arrays.asList(config.getStringList("Item for fishing (rare)", "Lists", new String[]{"264","388","372","384","368","378"}, "Rare items for fishing loot."));
             itemFishingLB = Arrays.asList(config.getStringList("Item for fishing Loot Box", "Lists", new String[]{"2256","2257","2258","2259","2260","2261","2262","2263","2264","2265","2266","2267","264","388","368","418","419","322"}, "Items for fishing lootbox."));
+            stealBlackList = Arrays.asList(config.getStringList("Containers blacklist for stealing", "Lists", new String[]{"999"}, "List of containers protected from theft (block IDs)."));
 
             maxSkillPoints = config.getInt("maxSkillPoints", "Settings", 30, 10,50,"Max skill points for each skill.");
             percentSkillOnDeath = config.getInt("percentSkillOnDeath", "Settings", 0, 0,100,"How much skill points will gone on death (percent).");

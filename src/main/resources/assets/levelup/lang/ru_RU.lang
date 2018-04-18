@@ -75,7 +75,7 @@ class.NONE.tooltip3=
 class.MINER.name=Шахтёр
 class.MINER.tooltip1=Навыки: +1 Добыча, +3 Кузнечное дело, +1 Стойкость
 class.MINER.tooltip2=Способности: +30% опыта от добычи руд; повышение скорости добычи ниже 60;
-class.MINER.tooltip3=активная "Поиск руд" - ищет ближайщую руду
+class.MINER.tooltip3=активная "Поиск руд" - выводит информацию о ближайших рудах
 class.SWORDSMAN.name=Мечник
 class.SWORDSMAN.tooltip1=Навыки: +5 Мечи, +3 Стойкость, +1 Атлетика
 class.SWORDSMAN.tooltip2=Способности: 20% шанс нанести урон по области;
@@ -125,17 +125,20 @@ tooltip.smith=Выковано кузнецом:
 tooltip.damage=Дополнительный урон:
 tooltip.crit=Шанс крит. удара:
 key.message.cooldown=Способность перезаряжается: %d
-miner.ores.none=Руд поблизости нет!
-miner.ores.ore=Ближайшая руда находится по координатам:
 blacksmith.xp.return=Вам был возвращен %d уровень
 peasant.smelting.double=Вы приготовили сразу 2 еды!
 smith.smelting.double=Вы выплавили сразу 2 слитка!
 farming.double=Урожай был удвоен!
+
+miner.ores.none=Руд поблизости нет!
+miner.ores.ore=Ближайшая руда находится по координатам:
+miner.ores.total=Поблизости можно найти:
 
 stealing.player.success=Вы украли %s!
 stealing.player.victim=Вас попытался обворовать %s!
 stealing.player.fail=Кража не удалась. Вас заметили!
 stealing.block.success=Вы украли из контейнера %s!
 stealing.block.fail=Кража не удалась.
+stealing.block.cannot=Из этого контейнера украсть нельзя.
 
 provocation.player=Вы спровоцировали всех мобов в радиусе 10 блоков атаковать вас!

@@ -115,22 +115,27 @@ public final class SkillPacketHandler {
                 }
             } else if (parts[1].equals("block")) {
                 // Steam from block
-                IInventory container = (IInventory) entityPlayerMP.worldObj.getTileEntity(Integer.parseInt(parts[2]), Integer.parseInt(parts[3]), Integer.parseInt(parts[4]));
-                System.out.print(container);
-                Integer inventorySlots = container.getSizeInventory();
-                int slot = random.nextInt(inventorySlots);
-                ItemStack stealingItem = container.getStackInSlot(slot);
-                // 20%
-                if (stealingItem != null && Math.random() <= 0.2 && stealingItem.isStackable()) {
-                    container.decrStackSize(slot, 1);
-                    entityPlayerMP.inventory.addItemStackToInventory(new ItemStack(stealingItem.getItem(), 1));
-                    entityPlayerMP.addChatComponentMessage(new ChatComponentTranslation("stealing.block.success", stealingItem.getItem().getItemStackDisplayName(stealingItem)));
-                    entityPlayerMP.worldObj.playSoundEffect(entityPlayerMP.posX, entityPlayerMP.posY, entityPlayerMP.posZ, "mob.irongolem.throw", 1.5F, 1.5F);
+                Block block = entityPlayerMP.worldObj.getBlock(Integer.parseInt(parts[2]), Integer.parseInt(parts[3]), Integer.parseInt(parts[4]));
+                Integer blockId = Block.getIdFromBlock(block);
+                if (!ConfigHelper.stealBlackList.contains(blockId.toString())) {
+                    IInventory container = (IInventory) entityPlayerMP.worldObj.getTileEntity(Integer.parseInt(parts[2]), Integer.parseInt(parts[3]), Integer.parseInt(parts[4]));
+                    System.out.print(container);
+                    Integer inventorySlots = container.getSizeInventory();
+                    int slot = random.nextInt(inventorySlots);
+                    ItemStack stealingItem = container.getStackInSlot(slot);
+                    // 20%
+                    if (stealingItem != null && Math.random() <= 0.2 && stealingItem.isStackable()) {
+                        container.decrStackSize(slot, 1);
+                        entityPlayerMP.inventory.addItemStackToInventory(new ItemStack(stealingItem.getItem(), 1));
+                        entityPlayerMP.addChatComponentMessage(new ChatComponentTranslation("stealing.block.success", stealingItem.getItem().getItemStackDisplayName(stealingItem)));
+                        entityPlayerMP.worldObj.playSoundEffect(entityPlayerMP.posX, entityPlayerMP.posY, entityPlayerMP.posZ, "mob.irongolem.throw", 1.5F, 1.5F);
+                    } else {
+                        entityPlayerMP.addChatComponentMessage(new ChatComponentTranslation("stealing.block.fail"));
+                        entityPlayerMP.worldObj.playSoundEffect(entityPlayerMP.posX, entityPlayerMP.posY, entityPlayerMP.posZ, "random.chestclosed", 1.0F, 1.0F);
+                    }
                 } else {
-                    entityPlayerMP.addChatComponentMessage(new ChatComponentTranslation("stealing.block.fail"));
-                    entityPlayerMP.worldObj.playSoundEffect(entityPlayerMP.posX, entityPlayerMP.posY, entityPlayerMP.posZ, "random.chestclosed", 1.0F, 1.0F);
+                    entityPlayerMP.addChatComponentMessage(new ChatComponentTranslation("stealing.block.cannot"));
                 }
-
             }
         } else if (packetString.equals("sentinelBuff")) {
             entityPlayerMP.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 200, 2, true));
@@ -149,7 +154,7 @@ public final class SkillPacketHandler {
             entityPlayerMP.addChatComponentMessage(new ChatComponentTranslation("provocation.player"));
             entityPlayerMP.worldObj.playSoundEffect(entityPlayerMP.posX, entityPlayerMP.posY, entityPlayerMP.posZ, "mob.irongolem.death", 1.2F, 1.2F);
         } else if (packetString.equals("minerBuff")) {
-            entityPlayerMP.worldObj.playSoundEffect(entityPlayerMP.posX, entityPlayerMP.posY, entityPlayerMP.posZ, "note.pling", 1.2F, 1.2F);
+            entityPlayerMP.worldObj.playSoundEffect(entityPlayerMP.posX, entityPlayerMP.posY, entityPlayerMP.posZ, "note.snare", 1.2F, 1.2F);
         } else if (packetString.equals("travellerBuff")) {
             entityPlayerMP.addPotionEffect(new PotionEffect(Potion.moveSpeed.id, 300, 2, true));
             entityPlayerMP.addPotionEffect(new PotionEffect(Potion.jump.id, 300, 1, true));
