@@ -220,6 +220,9 @@ public final class SkillPacketHandler {
         ByteBuf buf = Unpooled.buffer();
         buf.writeInt(dat[0]);
         buf.writeInt(dat[1]);
+        buf.writeInt(dat[2]);
+        buf.writeInt(dat[3]);
+        buf.writeInt(dat[4]);
         FMLProxyPacket pkt = new FMLProxyPacket(buf, PacketChannel.LEVELUPCFG.name());
         pkt.setTarget(Side.CLIENT);
         return pkt;

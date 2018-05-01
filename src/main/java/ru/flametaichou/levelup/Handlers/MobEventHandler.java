@@ -21,7 +21,6 @@ public class MobEventHandler {
 	
     private static List<String> itemListLoot;
     private static List<String> itemRareListLoot;
-    final Random random = new Random();
     public static final MobEventHandler INSTANCE = new MobEventHandler();
 
 	@SubscribeEvent
@@ -45,6 +44,7 @@ public class MobEventHandler {
 				if (event.entity instanceof EntityMob && bonus > 0) {
 					double d = Math.random() * 100;
 					if (d <= bonus) {
+						Random random = new Random();
 						count = random.nextInt(bonus / 5) + 1;
 						int index = random.nextInt(itemListLoot.size());
 						Item item = Item.getItemById(Integer.parseInt(itemListLoot.get(index)));
@@ -52,6 +52,7 @@ public class MobEventHandler {
 						EntityItem drop = new EntityItem(event.entity.worldObj, event.entity.posX, event.entity.posY, event.entity.posZ, stack);
 						event.drops.add(drop);
 					} else if (d < (bonus + bonus / 5)) {
+						Random random = new Random();
 						int index = random.nextInt(itemRareListLoot.size());
 						Item item = Item.getItemById(Integer.parseInt(itemRareListLoot.get(index)));
 						ItemStack stack = new ItemStack(item);
