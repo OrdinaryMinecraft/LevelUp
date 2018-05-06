@@ -133,7 +133,7 @@ public final class SkillKeyHandler {
 
                     // Marksman class bonus
                     if (playerClass == PlayerClass.MARKSMAN) {
-                        PlayerExtendedProperties.from(player).sendDoubleShotCount(3);
+                        PlayerExtendedProperties.from(player).sendDoubleShotCount(3, player.worldObj.isRemote);
                     }
 
                     // Swordsman class bonus
@@ -183,7 +183,7 @@ public final class SkillKeyHandler {
                         LevelUp.otherChannel.sendToServer(packet);
                     }
 
-                    PlayerExtendedProperties.from(player).sendLastSkillActivation(player.worldObj.getTotalWorldTime());
+                    PlayerExtendedProperties.from(player).sendLastSkillActivation(player.worldObj.getTotalWorldTime(), player.worldObj.isRemote);
                 } else {
                     long timeDiff = player.worldObj.getTotalWorldTime() - PlayerExtendedProperties.from(player).loadLastSkillActivation();
                     player.addChatComponentMessage(new ChatComponentTranslation("key.message.cooldown", skillColldown / 20 - timeDiff / 20));

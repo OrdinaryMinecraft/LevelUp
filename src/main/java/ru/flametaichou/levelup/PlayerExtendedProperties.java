@@ -63,9 +63,11 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
      * Полоски воздуха
      */
 
-    public void sendAirData(int air) {
+    public void sendAirData(int air, boolean client) {
         saveAirData(air);
-        sendExtPropsToServer();
+        if (client) {
+            sendExtPropsToServer();
+        }
     }
 
     public void saveAirData(int air) {
@@ -84,9 +86,11 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
      * Очистка от негативных эффектов
      */
 
-    public void sendEffectData(boolean clear) {
+    public void sendEffectData(boolean clear, boolean client) {
         saveEffectData(clear);
-        sendExtPropsToServer();
+        if (client) {
+            sendExtPropsToServer();
+        }
     }
 
     public void saveEffectData(boolean clear) {
@@ -101,9 +105,11 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
      * Время последнего использования классовой способности
      */
 
-    public void sendLastSkillActivation(long l) {
+    public void sendLastSkillActivation(long l, boolean client) {
         saveLastSkillActivation(l);
-        sendExtPropsToServer();
+        if (client) {
+            sendExtPropsToServer();
+        }
     }
 
     public void saveLastSkillActivation(long l) {
@@ -118,9 +124,11 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
      * Количество двойных выстрелов для лучника
      */
 
-    public void sendDoubleShotCount(int dsc) {
+    public void sendDoubleShotCount(int dsc, boolean client) {
         saveDoubleShotCount(dsc);
-        sendExtPropsToServer();
+        if (client) {
+            sendExtPropsToServer();
+        }
     }
 
     public void saveDoubleShotCount(int dsc) {

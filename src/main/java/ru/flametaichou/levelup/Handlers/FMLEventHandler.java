@@ -66,7 +66,7 @@ public final class FMLEventHandler {
             // Clear effects
             if (PlayerExtendedProperties.from(player).loadEffectData()) {
                 removeEffects(player);
-                PlayerExtendedProperties.from(player).sendEffectData(false);
+                PlayerExtendedProperties.from(player).sendEffectData(false, player.worldObj.isRemote);
             }
 
             if (player.worldObj.getWorldTime() % 50 == 0 && !player.worldObj.isRemote) {
@@ -76,7 +76,7 @@ public final class FMLEventHandler {
                 }
                 // Hunter class bonus
                 if (PlayerExtendedProperties.getPlayerClass(player) == PlayerClass.HUNTER && WorldUtils.isNight(event.player.worldObj)) {
-                    player.addPotionEffect(new PotionEffect(Potion.nightVision.id, 250, 0, true));
+                    player.addPotionEffect(new PotionEffect(Potion.nightVision.id, 300, -1, true));
                 }
                 // Thief class bonus
                 if (PlayerExtendedProperties.getPlayerClass(player) == PlayerClass.THIEF && player.isSneaking()) {
@@ -116,7 +116,7 @@ public final class FMLEventHandler {
     		}
     		else if (!flagSetCounter) {
     			int bonus = PlayerExtendedProperties.getSkill(player, PlayerSkill.SWIMMING);
-    			PlayerExtendedProperties.from(player).sendAirData(bonus / 5);
+    			PlayerExtendedProperties.from(player).sendAirData(bonus / 5, player.worldObj.isRemote);
     			flagSetCounter = true;
     		}
 

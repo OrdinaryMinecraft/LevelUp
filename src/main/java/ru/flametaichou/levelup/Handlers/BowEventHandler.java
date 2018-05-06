@@ -82,7 +82,7 @@ public final class BowEventHandler {
                             if (arrow.isEntityAlive())
                             arrow.setDead();
 
-                            PlayerExtendedProperties.from(archer).sendDoubleShotCount(PlayerExtendedProperties.from(archer).loadDoubleShotCount() - 1);
+                            PlayerExtendedProperties.from(archer).sendDoubleShotCount(PlayerExtendedProperties.from(archer).loadDoubleShotCount() - 1, archer.worldObj.isRemote);
                         }
                     }
 

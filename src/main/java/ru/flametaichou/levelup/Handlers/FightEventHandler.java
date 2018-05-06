@@ -38,7 +38,7 @@ public final class FightEventHandler {
                 if (PlayerExtendedProperties.from(player).loadAirData() > 0) {
                 	event.setCanceled(true);
                 	player.setAir(300);
-                	PlayerExtendedProperties.from(player).sendAirData(PlayerExtendedProperties.from(player).loadAirData() - 1);
+                	PlayerExtendedProperties.from(player).sendAirData(PlayerExtendedProperties.from(player).loadAirData() - 1, player.worldObj.isRemote);
                     player.addChatComponentMessage(new ChatComponentTranslation("water.count", PlayerExtendedProperties.from(player).loadAirData()));
                     }
                 }
@@ -145,7 +145,7 @@ public final class FightEventHandler {
                 	player.getEntityWorld().playAuxSFX(2005, (int) player.posX-1, (int) player.posY+1, (int) player.posZ, 0);
                 	player.worldObj.playSoundEffect(player.posX, player.posY, player.posZ, "random.levelup", 2.0F, 1.5F + random.nextFloat() * 0.2F);
                 	
-                	PlayerExtendedProperties.from(player).sendEffectData(true);
+                	PlayerExtendedProperties.from(player).sendEffectData(true, player.worldObj.isRemote);
                 }
             }
         }
