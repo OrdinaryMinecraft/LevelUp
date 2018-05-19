@@ -41,7 +41,7 @@ public final class LevelUp {
     @SidedProxy(clientSide = "ru.flametaichou.levelup.SkillClientProxy", serverSide = "ru.flametaichou.levelup.SkillProxy")
     public static SkillProxy proxy;
     private static Item xpTalisman;
-    private static Item expOrb;
+    public static Item expOrb;
     private static Item respecBook;
     public static Item iconHunter, iconThief, iconPeasant, iconSmith, iconSentinel, iconTraveller, iconAthletics, iconHearth, iconSneaking, iconSwimming;
     public static Item fishingLootBox;

@@ -17,8 +17,10 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityFishHook;
 import net.minecraft.init.Items;
 import net.minecraft.item.*;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
@@ -100,6 +102,21 @@ public final class FMLEventHandler {
                             PotionEffect effect = (PotionEffect) obj;
                             if (effect.getPotionID() == Potion.hunger.id) {
                                 player.removePotionEffect(Potion.hunger.id);
+                            }
+                        }
+                    }
+                }
+                // Orb Pickup
+                if (player.inventory.hasItem(LevelUp.expOrb)) {
+                    if (!PlayerUtils.playerIsOp((EntityPlayerMP) player) && !MinecraftServer.getServer().isSinglePlayer()) {
+                        for (ItemStack itemstack : player.inventory.mainInventory) {
+                            if (itemstack != null && itemstack.getItem() != null && itemstack.getItem() == LevelUp.expOrb) {
+                                if (itemstack.getTagCompound() == null ||
+                                        (itemstack.getTagCompound() != null &&
+                                                (itemstack.getTagCompound().getString("Owner") == null ||
+                                                        itemstack.getTagCompound().getString("Owner").equals("")))) {
+                                    writeOwner(itemstack, player.getDisplayName());
+                                }
                             }
                         }
                     }
@@ -336,6 +353,15 @@ public final class FMLEventHandler {
             FMLProxyPacket packet = SkillPacketHandler.getExtPropPacket(Side.CLIENT, PlayerExtendedProperties.from(player).loadExtendedProperties().toString());
             LevelUp.extPropertiesChannel.sendTo(packet, (EntityPlayerMP) player);
         }
+    }
+
+    // write "Owner" flag onto a expOrb
+    private void writeOwner(ItemStack toDrop, String playerName) {
+        NBTTagCompound tagCompound = toDrop.getTagCompound();
+        if (tagCompound == null)
+            tagCompound = new NBTTagCompound();
+        tagCompound.setString("Owner", playerName);
+        toDrop.setTagCompound(tagCompound);
     }
 
 }

@@ -101,3 +101,4 @@ water.count=You have %d reserved air bars left
 tooltip.smith=Forged by blacksmith:
 tooltip.damage=Bonus damage:
 tooltip.crit=Bonus crit:
+tooltip.owner=Owner:

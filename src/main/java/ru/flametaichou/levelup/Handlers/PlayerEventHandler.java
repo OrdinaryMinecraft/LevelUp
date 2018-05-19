@@ -33,6 +33,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.oredict.OreDictionary;
 import ru.flametaichou.levelup.ClassBonus;
+import ru.flametaichou.levelup.Items.ItemExpOrb;
 import ru.flametaichou.levelup.LevelUp;
 import ru.flametaichou.levelup.Model.PlayerClass;
 import ru.flametaichou.levelup.Model.PlayerSkill;
@@ -81,7 +82,7 @@ public final class PlayerEventHandler {
 //            event.newSpeed = event.newSpeed + getSkill(event.entityPlayer, 3) / 5 * 0.2F;
 //        }
     }
-    
+
     /**
      * Track player deaths to reset values when appropriate,
      * and player final strikes on mobs to give bonus xp
@@ -109,7 +110,7 @@ public final class PlayerEventHandler {
     	player.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(player.getMaxHealth());
     }
      */
-    
+
     /**
      * Change fishing by adding some loots
      * Prevent flagged block placement
@@ -204,12 +205,11 @@ public final class PlayerEventHandler {
                 }
             }
     }
-    
+
     @SubscribeEvent
     public void onPickupXP(PlayerPickupXpEvent event) {
     	LevelUp.giveBonusRandomXP(event.entityPlayer);
     }
-    
 
     @SubscribeEvent
     public void onHarvest(BlockEvent.HarvestDropsEvent event) {
@@ -298,6 +298,10 @@ public final class PlayerEventHandler {
             }
             if (event.itemStack.getTagCompound().getInteger("BonusCrit") != 0) {
                 String lore = StatCollector.translateToLocal("tooltip.crit") + " " + event.itemStack.getTagCompound().getInteger("BonusCrit") + "%";
+                event.toolTip.add(lore);
+            }
+            if (event.itemStack.getTagCompound().getString("Owner") != "") {
+                String lore = StatCollector.translateToLocal("tooltip.owner") + " " + event.itemStack.getTagCompound().getString("Owner");
                 event.toolTip.add(lore);
             }
         }
