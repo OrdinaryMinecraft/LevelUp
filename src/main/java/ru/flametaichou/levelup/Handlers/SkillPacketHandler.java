@@ -25,12 +25,14 @@ import ru.flametaichou.levelup.Util.ConfigHelper;
 import ru.flametaichou.levelup.Util.EnumUtils;
 import ru.flametaichou.levelup.Util.PlayerUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public final class SkillPacketHandler {
 
     private Random random = new Random();
+    private static double stealChanse = 0.2;
 
     @SubscribeEvent
     public void onServerPacket(FMLNetworkEvent.ServerCustomPacketEvent event) {
@@ -89,13 +91,27 @@ public final class SkillPacketHandler {
                 // Steam from player
                 EntityPlayer victim = entityPlayerMP.worldObj.getPlayerEntityByName(parts[2]);
                 int inventorySlots = victim.inventory.mainInventory.length;
-                int slot = random.nextInt(inventorySlots);
-                ItemStack stealingItem = victim.inventory.mainInventory[slot];
+                List<Integer> slotsArray = new ArrayList<Integer>();
+                for (int i = 0; i < inventorySlots; i++) {
+                    if (victim.inventory.mainInventory[i] != null && victim.inventory.mainInventory[i].isStackable()) {
+                        slotsArray.add(i);
+                    }
+                }
+                //int slot = random.nextInt(inventorySlots);
+                //ItemStack stealingItem = victim.inventory.mainInventory[slot];
+                if (slotsArray.size() < 1) {
+                    entityPlayerMP.addChatComponentMessage(new ChatComponentTranslation("stealing.player.empty"));
+                    return;
+                }
                 // more than 10 secs after attack to steal
-                if (stealingItem != null && Math.random() <= 0.2 &&
-                        stealingItem.isStackable() &&
-                        !victim.capabilities.isCreativeMode &&
-                        PlayerUtils.timeAfterLastAttack(victim) > 200) {
+                if (victim.capabilities.isCreativeMode || PlayerUtils.timeAfterLastAttack(victim) > 200) {
+                    entityPlayerMP.addChatComponentMessage(new ChatComponentTranslation("stealing.player.cannot"));
+                    return;
+                }
+
+                int slot = random.nextInt(slotsArray.size()-1);
+                ItemStack stealingItem = victim.inventory.mainInventory[slotsArray.get(slot)];
+                if (Math.random() <= stealChanse) {
                     victim.inventory.consumeInventoryItem(stealingItem.getItem());
                     entityPlayerMP.inventory.addItemStackToInventory(new ItemStack(stealingItem.getItem(), 1));
                     entityPlayerMP.addChatComponentMessage(new ChatComponentTranslation("stealing.player.success", stealingItem.getItem().getItemStackDisplayName(stealingItem)));
@@ -113,10 +129,25 @@ public final class SkillPacketHandler {
                     IInventory container = (IInventory) entityPlayerMP.worldObj.getTileEntity(Integer.parseInt(parts[2]), Integer.parseInt(parts[3]), Integer.parseInt(parts[4]));
                     System.out.print(container);
                     Integer inventorySlots = container.getSizeInventory();
-                    int slot = random.nextInt(inventorySlots);
-                    ItemStack stealingItem = container.getStackInSlot(slot);
+
+                    List<Integer> slotsArray = new ArrayList<Integer>();
+                    for (int i = 0; i < inventorySlots; i++) {
+                        if (container.getStackInSlot(i) != null && container.getStackInSlot(i).isStackable()) {
+                            slotsArray.add(i);
+                        }
+                    }
+                    if (slotsArray.size() < 1) {
+                        entityPlayerMP.addChatComponentMessage(new ChatComponentTranslation("stealing.block.empty"));
+                        return;
+                    }
+
+                    //int slot = random.nextInt(inventorySlots);
+                    //ItemStack stealingItem = container.getStackInSlot(slot);
+
+                    int slot = random.nextInt(slotsArray.size()-1);
+                    ItemStack stealingItem = container.getStackInSlot(slotsArray.get(slot));
                     // 20%
-                    if (stealingItem != null && Math.random() <= 0.2 && stealingItem.isStackable()) {
+                    if (Math.random() <= stealChanse) {
                         container.decrStackSize(slot, 1);
                         entityPlayerMP.inventory.addItemStackToInventory(new ItemStack(stealingItem.getItem(), 1));
                         entityPlayerMP.addChatComponentMessage(new ChatComponentTranslation("stealing.block.success", stealingItem.getItem().getItemStackDisplayName(stealingItem)));

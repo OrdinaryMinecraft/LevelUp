@@ -96,13 +96,16 @@ public final class FMLEventHandler {
                 // Traveller class bonus
                 if (PlayerExtendedProperties.getPlayerClass(player) == PlayerClass.TRAVELLER) {
                     if (!player.getActivePotionEffects().isEmpty()) {
-                        boolean flagHunger = false;
+                        boolean hungerFound = false;
                         Collection effectsList = player.getActivePotionEffects();
                         for (Object obj : effectsList) {
                             PotionEffect effect = (PotionEffect) obj;
                             if (effect.getPotionID() == Potion.hunger.id) {
-                                player.removePotionEffect(Potion.hunger.id);
+                                hungerFound = true;
                             }
+                        }
+                        if (hungerFound) {
+                            player.removePotionEffect(Potion.hunger.id);
                         }
                     }
                 }

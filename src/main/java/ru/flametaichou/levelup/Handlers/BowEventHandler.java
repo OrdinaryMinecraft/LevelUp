@@ -43,46 +43,50 @@ public final class BowEventHandler {
                     // Double shots
                     if (PlayerExtendedProperties.from(archer).loadDoubleShotCount() > 0) {
 
-                        int countArrows = 0;
-                        ItemStack arrowStack = null;
-                        for (ItemStack s : archer.inventory.mainInventory)
-                        {
-                            if (s != null && s.getItem() == Items.arrow) {
-                                countArrows = countArrows + s.stackSize;
-                                arrowStack = s;
+                        // If this is Arrow (not a bolt or a bullet)
+                        if (event.entity.getClass().getName().equals(EntityArrow.class.getName())) {
+
+                            int countArrows = 0;
+                            ItemStack arrowStack = null;
+                            for (ItemStack s : archer.inventory.mainInventory)
+                            {
+                                if (s != null && s.getItem() == Items.arrow) {
+                                    countArrows = countArrows + s.stackSize;
+                                    arrowStack = s;
+                                }
                             }
-                        }
 
-                        Random random = new Random();
+                            Random random = new Random();
 
-                        if (countArrows > 0 || archer.capabilities.isCreativeMode) {
-                            int bonusArrows = 2;
-                            for (int i=0; i < bonusArrows; i++) {
-                                EntityCustomArrow arrow2 = new EntityCustomArrow(arrow.worldObj, archer, 0);
-                                arrow2.setDamage(arrow.getDamage());
-                                arrow2.posX = arrow.posX + 0.1 + random.nextFloat() * (-0.1 - 0.1);
-                                arrow2.posY = arrow.posY + 0.1 + random.nextFloat() * (-0.1 - 0.1);
-                                arrow2.posZ = arrow.posZ + 0.1 + random.nextFloat() * (-0.1 - 0.1);
-                                arrow2.rotationPitch = arrow.rotationPitch;
-                                arrow2.rotationYaw = arrow.rotationYaw;
-                                arrow2.motionX = arrow.motionX + 0.1 + random.nextFloat() * (-0.1 - 0.1);
-                                arrow2.motionY = arrow.motionY + 0.1 + random.nextFloat() * (-0.1 - 0.1);
-                                arrow2.motionZ = arrow.motionZ + 0.1 + random.nextFloat() * (-0.1 - 0.1);
-                                arrow2.setIsCritical(arrow.getIsCritical());
-                                if (PlayerExtendedProperties.from(archer).loadFireShotCount() <= 0) arrow2.setFire(2);
-                                arrow2.setSneaking(true);
+                            if (countArrows > 0 || archer.capabilities.isCreativeMode) {
+                                int bonusArrows = 2;
+                                for (int i=0; i < bonusArrows; i++) {
+                                    EntityCustomArrow arrow2 = new EntityCustomArrow(arrow.worldObj, archer, 0);
+                                    arrow2.setDamage(arrow.getDamage());
+                                    arrow2.posX = arrow.posX + 0.1 + random.nextFloat() * (-0.1 - 0.1);
+                                    arrow2.posY = arrow.posY + 0.1 + random.nextFloat() * (-0.1 - 0.1);
+                                    arrow2.posZ = arrow.posZ + 0.1 + random.nextFloat() * (-0.1 - 0.1);
+                                    arrow2.rotationPitch = arrow.rotationPitch;
+                                    arrow2.rotationYaw = arrow.rotationYaw;
+                                    arrow2.motionX = arrow.motionX + 0.1 + random.nextFloat() * (-0.1 - 0.1);
+                                    arrow2.motionY = arrow.motionY + 0.1 + random.nextFloat() * (-0.1 - 0.1);
+                                    arrow2.motionZ = arrow.motionZ + 0.1 + random.nextFloat() * (-0.1 - 0.1);
+                                    arrow2.setIsCritical(arrow.getIsCritical());
+                                    if (PlayerExtendedProperties.from(archer).loadFireShotCount() <= 0) arrow2.setFire(2);
+                                    arrow2.setSneaking(true);
 
-                                if (i != 0)
-                                    if (!archer.capabilities.isCreativeMode) {
-                                        archer.inventory.consumeInventoryItem(Items.arrow);
-                                    }
+                                    if (i != 0)
+                                        if (!archer.capabilities.isCreativeMode) {
+                                            archer.inventory.consumeInventoryItem(Items.arrow);
+                                        }
 
-                                arrow.worldObj.spawnEntityInWorld(arrow2);
+                                    arrow.worldObj.spawnEntityInWorld(arrow2);
+                                }
+                                if (arrow.isEntityAlive())
+                                    arrow.setDead();
+
+                                PlayerExtendedProperties.from(archer).sendDoubleShotCount(PlayerExtendedProperties.from(archer).loadDoubleShotCount() - 1, archer.worldObj.isRemote);
                             }
-                            if (arrow.isEntityAlive())
-                            arrow.setDead();
-
-                            PlayerExtendedProperties.from(archer).sendDoubleShotCount(PlayerExtendedProperties.from(archer).loadDoubleShotCount() - 1, archer.worldObj.isRemote);
                         }
                     }
 
