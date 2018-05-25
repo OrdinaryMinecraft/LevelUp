@@ -17,6 +17,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChatComponentTranslation;
+import net.minecraftforge.event.world.NoteBlockEvent;
 import ru.flametaichou.levelup.*;
 import ru.flametaichou.levelup.Model.ExtPropPacket;
 import ru.flametaichou.levelup.Model.PacketChannel;
@@ -32,7 +33,7 @@ import java.util.Random;
 public final class SkillPacketHandler {
 
     private Random random = new Random();
-    private static double stealChanse = 0.2;
+    private static double basicStealChanse = 0.2;
 
     @SubscribeEvent
     public void onServerPacket(FMLNetworkEvent.ServerCustomPacketEvent event) {
@@ -104,9 +105,27 @@ public final class SkillPacketHandler {
                     return;
                 }
                 // more than 10 secs after attack to steal
-                if (victim.capabilities.isCreativeMode || PlayerUtils.timeAfterLastAttack(victim) > 200) {
+                if (victim.capabilities.isCreativeMode || PlayerUtils.timeAfterLastAttack(victim) <= 200) {
                     entityPlayerMP.addChatComponentMessage(new ChatComponentTranslation("stealing.player.cannot"));
                     return;
+                }
+
+                double stealChanse = basicStealChanse;
+                // If player is invisible +20% chance
+                if (entityPlayerMP.isInvisible()) {
+                    stealChanse = stealChanse + 0.2;
+                }
+                // If player is in shadow +20% chance
+                if (PlayerUtils.playerIsInShadow(entityPlayerMP)) {
+                    stealChanse = stealChanse + 0.2;
+                }
+                // If player is on sun -10% chance
+                if (PlayerUtils.playerIsOnSun(entityPlayerMP)) {
+                    stealChanse = stealChanse - 0.1;
+                }
+                // If victim does not see player x2 chance
+                if (victim.canEntityBeSeen(entityPlayerMP)) {
+                    stealChanse = stealChanse * 2;
                 }
 
                 int slot = random.nextInt(slotsArray.size()-1);
@@ -147,7 +166,7 @@ public final class SkillPacketHandler {
                     int slot = random.nextInt(slotsArray.size()-1);
                     ItemStack stealingItem = container.getStackInSlot(slotsArray.get(slot));
                     // 20%
-                    if (Math.random() <= stealChanse) {
+                    if (Math.random() <= basicStealChanse) {
                         container.decrStackSize(slot, 1);
                         entityPlayerMP.inventory.addItemStackToInventory(new ItemStack(stealingItem.getItem(), 1));
                         entityPlayerMP.addChatComponentMessage(new ChatComponentTranslation("stealing.block.success", stealingItem.getItem().getItemStackDisplayName(stealingItem)));

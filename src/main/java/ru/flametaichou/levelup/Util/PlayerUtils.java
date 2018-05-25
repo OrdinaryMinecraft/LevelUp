@@ -20,4 +20,12 @@ public class PlayerUtils {
     public static boolean playerIsOp (EntityPlayerMP player) {
         return (player.canCommandSenderUseCommand(MinecraftServer.getServer().getOpPermissionLevel(), "gamemode"));
     }
+
+    public static boolean playerIsInShadow (EntityPlayer player) {
+        return player.worldObj.getBlockLightValue((int) player.posX, (int) player.posY, (int) player.posZ) <= 7;
+    }
+
+    public static boolean playerIsOnSun (EntityPlayer player) {
+        return player.worldObj.getBlockLightValue((int) player.posX, (int) player.posY, (int) player.posZ) >= 12;
+    }
 }

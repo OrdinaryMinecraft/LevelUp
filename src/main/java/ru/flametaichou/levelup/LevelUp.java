@@ -40,12 +40,13 @@ public final class LevelUp {
     public static LevelUp instance;
     @SidedProxy(clientSide = "ru.flametaichou.levelup.SkillClientProxy", serverSide = "ru.flametaichou.levelup.SkillProxy")
     public static SkillProxy proxy;
-    private static Item xpTalisman;
+    public static Item xpTalisman;
     public static Item expOrb;
     private static Item respecBook;
     public static Item iconHunter, iconThief, iconPeasant, iconSmith, iconSentinel, iconTraveller, iconAthletics, iconHearth, iconSneaking, iconSwimming;
     public static Item fishingLootBox;
     public static FMLEventChannel initChannel, skillChannel, classChannel, configChannel, extPropertiesChannel, otherChannel;
+    public static CreativeTabs tabLevelUp = new TabLevelUp("levelup");
 
     @EventHandler
     public void load(FMLInitializationEvent event) {
@@ -143,23 +144,23 @@ public final class LevelUp {
 	}
 
     private void registerItems() {
-        fishingLootBox = new ItemFishingLootBox().setUnlocalizedName("fishingLootBox").setTextureName(ID + ":FishingLootBox").setCreativeTab(CreativeTabs.tabMisc);
+        fishingLootBox = new ItemFishingLootBox().setUnlocalizedName("fishingLootBox").setTextureName(ID + ":FishingLootBox").setCreativeTab(tabLevelUp);
         GameRegistry.registerItem(fishingLootBox, "fishingLootBox");
 
-        xpTalisman = new Item().setUnlocalizedName("xpTalisman").setTextureName(ID + ":XPTalisman").setCreativeTab(CreativeTabs.tabMisc);
+        xpTalisman = new Item().setUnlocalizedName("xpTalisman").setTextureName(ID + ":XPTalisman").setCreativeTab(tabLevelUp);
         GameRegistry.registerItem(xpTalisman, "xpTalisman");
         if (ConfigHelper.xpTalismanRecipe) {
             GameRegistry.addRecipe(new ShapedOreRecipe(xpTalisman, "GG ", " R ", " GG", 'G', Items.gold_ingot, 'R', Items.ender_pearl));
         }
 
-        respecBook = new ItemRespecBook().setUnlocalizedName("respecBook").setTextureName(ID + ":RespecBook").setCreativeTab(CreativeTabs.tabMisc);
+        respecBook = new ItemRespecBook().setUnlocalizedName("respecBook").setTextureName(ID + ":RespecBook").setCreativeTab(tabLevelUp);
         GameRegistry.registerItem(respecBook, "respecBook");
         if (ConfigHelper.respecBookRecipe) {
             GameRegistry.addRecipe(new ItemStack(respecBook), "OEO", "DBD", "ODO", 'O', Blocks.obsidian, 'D', new ItemStack(Items.dye),
                 'E', Items.ender_pearl, 'B', Items.book);
         }
 
-        expOrb = new ItemExpOrb().setUnlocalizedName("expOrb").setTextureName(ID + ":expOrb").setCreativeTab(CreativeTabs.tabMisc);
+        expOrb = new ItemExpOrb().setUnlocalizedName("expOrb").setTextureName(ID + ":expOrb").setCreativeTab(tabLevelUp);
         GameRegistry.registerItem(expOrb, "expOrb");
 
         iconHunter = new Item().setUnlocalizedName("iconHunter").setTextureName(ID + ":bow_sword");
