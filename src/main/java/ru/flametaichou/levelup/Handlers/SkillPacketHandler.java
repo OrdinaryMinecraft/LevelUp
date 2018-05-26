@@ -128,7 +128,7 @@ public final class SkillPacketHandler {
                     stealChanse = stealChanse * 2;
                 }
 
-                int slot = random.nextInt(slotsArray.size()-1);
+                int slot = random.nextInt(slotsArray.size());
                 ItemStack stealingItem = victim.inventory.mainInventory[slotsArray.get(slot)];
                 if (Math.random() <= stealChanse) {
                     victim.inventory.consumeInventoryItem(stealingItem.getItem());
@@ -163,7 +163,7 @@ public final class SkillPacketHandler {
                     //int slot = random.nextInt(inventorySlots);
                     //ItemStack stealingItem = container.getStackInSlot(slot);
 
-                    int slot = random.nextInt(slotsArray.size()-1);
+                    int slot = random.nextInt(slotsArray.size());
                     ItemStack stealingItem = container.getStackInSlot(slotsArray.get(slot));
                     // 20%
                     if (Math.random() <= basicStealChanse) {
