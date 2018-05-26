@@ -17,6 +17,7 @@ public class ItemExpOrb extends Item {
 
     public ItemExpOrb() {
         super();
+        this.setMaxStackSize(1);
     }
 
     @Override

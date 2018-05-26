@@ -113,11 +113,11 @@ public final class SkillPacketHandler {
                 double stealChanse = basicStealChanse;
                 // If player is invisible +20% chance
                 if (entityPlayerMP.isInvisible()) {
-                    stealChanse = stealChanse + 0.2;
+                    stealChanse = stealChanse + 0.1;
                 }
                 // If player is in shadow +20% chance
                 if (PlayerUtils.playerIsInShadow(entityPlayerMP)) {
-                    stealChanse = stealChanse + 0.2;
+                    stealChanse = stealChanse + 0.1;
                 }
                 // If player is on sun -10% chance
                 if (PlayerUtils.playerIsOnSun(entityPlayerMP)) {
@@ -127,12 +127,17 @@ public final class SkillPacketHandler {
                 if (victim.canEntityBeSeen(entityPlayerMP)) {
                     stealChanse = stealChanse * 2;
                 }
+                if (stealChanse > 1) {
+                    stealChanse = 1;
+                }
 
                 int slot = random.nextInt(slotsArray.size());
                 ItemStack stealingItem = victim.inventory.mainInventory[slotsArray.get(slot)];
                 if (Math.random() <= stealChanse) {
+                    ItemStack stealingItemCopy = stealingItem.copy();
+                    stealingItemCopy.stackSize = 1;
                     victim.inventory.consumeInventoryItem(stealingItem.getItem());
-                    entityPlayerMP.inventory.addItemStackToInventory(new ItemStack(stealingItem.getItem(), 1));
+                    entityPlayerMP.inventory.addItemStackToInventory(stealingItemCopy);
                     entityPlayerMP.addChatComponentMessage(new ChatComponentTranslation("stealing.player.success", stealingItem.getItem().getItemStackDisplayName(stealingItem)));
                     entityPlayerMP.worldObj.playSoundEffect(entityPlayerMP.posX, entityPlayerMP.posY, entityPlayerMP.posZ, "mob.irongolem.throw", 1.5F, 1.5F);
                 } else {
@@ -167,8 +172,10 @@ public final class SkillPacketHandler {
                     ItemStack stealingItem = container.getStackInSlot(slotsArray.get(slot));
                     // 20%
                     if (Math.random() <= basicStealChanse) {
+                        ItemStack stealingItemCopy = stealingItem.copy();
+                        stealingItemCopy.stackSize = 1;
                         container.decrStackSize(slot, 1);
-                        entityPlayerMP.inventory.addItemStackToInventory(new ItemStack(stealingItem.getItem(), 1));
+                        entityPlayerMP.inventory.addItemStackToInventory(stealingItemCopy);
                         entityPlayerMP.addChatComponentMessage(new ChatComponentTranslation("stealing.block.success", stealingItem.getItem().getItemStackDisplayName(stealingItem)));
                         entityPlayerMP.worldObj.playSoundEffect(entityPlayerMP.posX, entityPlayerMP.posY, entityPlayerMP.posZ, "mob.irongolem.throw", 1.5F, 1.5F);
                     } else {

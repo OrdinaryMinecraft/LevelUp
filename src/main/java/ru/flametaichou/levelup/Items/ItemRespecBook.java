@@ -15,6 +15,7 @@ import java.util.List;
 public final class ItemRespecBook extends Item {
     public ItemRespecBook() {
         super();
+        this.setMaxStackSize(1);
     }
 
     @Override
