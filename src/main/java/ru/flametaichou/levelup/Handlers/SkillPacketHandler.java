@@ -151,7 +151,6 @@ public final class SkillPacketHandler {
                 Integer blockId = Block.getIdFromBlock(block);
                 if (!ConfigHelper.stealBlackList.contains(blockId.toString())) {
                     IInventory container = (IInventory) entityPlayerMP.worldObj.getTileEntity(Integer.parseInt(parts[2]), Integer.parseInt(parts[3]), Integer.parseInt(parts[4]));
-                    System.out.print(container);
                     Integer inventorySlots = container.getSizeInventory();
 
                     List<Integer> slotsArray = new ArrayList<Integer>();

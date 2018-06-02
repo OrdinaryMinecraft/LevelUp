@@ -151,7 +151,6 @@ public final class SkillKeyHandler {
                                 if (objectMouseOver.entityHit instanceof EntityPlayer) {
                                     EntityPlayer victim = (EntityPlayer) objectMouseOver.entityHit;
                                     // Steal from player
-                                    System.out.print("player");
                                     FMLProxyPacket packet = SkillPacketHandler.getOtherPacket(Side.SERVER, "steal/player/" + victim.getDisplayName());
                                     LevelUp.otherChannel.sendToServer(packet);
                                 }
@@ -162,7 +161,6 @@ public final class SkillKeyHandler {
                                     // if (block instanceof BlockContainer || block instanceof IInventory)
                                     if (te instanceof IInventory) {
                                         // Steal from container
-                                        System.out.print("block");
                                         FMLProxyPacket packet = SkillPacketHandler.getOtherPacket(Side.SERVER, "steal/block/" + objectMouseOver.blockX + "/" + objectMouseOver.blockY + "/" + objectMouseOver.blockZ);
                                         LevelUp.otherChannel.sendToServer(packet);
                                     }

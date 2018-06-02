@@ -45,7 +45,10 @@ public class MobEventHandler {
 					double d = Math.random() * 100;
 					if (d <= bonus) {
 						Random random = new Random();
-						count = random.nextInt(bonus / 5) + 1;
+						count = 1;
+						if (bonus >= 5) {
+							count = random.nextInt(bonus / 5) + 1;
+						}
 						int index = random.nextInt(itemListLoot.size());
 						Item item = Item.getItemById(Integer.parseInt(itemListLoot.get(index)));
 						ItemStack stack = new ItemStack(item, count);

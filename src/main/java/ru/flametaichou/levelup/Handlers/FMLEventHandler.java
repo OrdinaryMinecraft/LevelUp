@@ -290,6 +290,7 @@ public final class FMLEventHandler {
                     event.player.addChatComponentMessage(new ChatComponentTranslation("smith.smelting.double"));
                 }
             }
+            //TODO: добавить обработку shift
             EntityItem entityitem = ForgeHooks.onPlayerTossEvent(event.player, add, true);
             if (entityitem != null) {
                 entityitem.delayBeforeCanPickup = 0;
