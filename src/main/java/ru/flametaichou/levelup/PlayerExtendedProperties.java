@@ -27,6 +27,9 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
     private int latestExp;
     private Map<PlayerSkill, Integer> skillMap = new HashMap<PlayerSkill, Integer>();
 
+    private String thiefName;
+    private long thiefTime;
+
     public PlayerExtendedProperties() {
         for (PlayerSkill skill : PlayerSkill.values())
             skillMap.put(skill, 0);
@@ -62,7 +65,6 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
     /*
      * Полоски воздуха
      */
-
     public void sendAirData(int air, boolean client) {
         saveAirData(air);
         if (client) {
@@ -85,7 +87,6 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
     /*
      * Очистка от негативных эффектов
      */
-
     public void sendEffectData(boolean clear, boolean client) {
         saveEffectData(clear);
         if (client) {
@@ -104,7 +105,6 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
     /*
      * Время последнего использования классовой способности
      */
-
     public void sendLastSkillActivation(long l, boolean client) {
         saveLastSkillActivation(l);
         if (client) {
@@ -123,7 +123,6 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
     /*
      * Количество двойных выстрелов для лучника
      */
-
     public void sendDoubleShotCount(int dsc, boolean client) {
         saveDoubleShotCount(dsc);
         if (client) {
@@ -143,7 +142,6 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
      * Количество огненных выстрелов для лучника
      * Работает только на стороне клиента (?)
      */
-
     public void saveFireShotCount(int fsc) {
         fireShotCount = fsc;
     }
@@ -156,13 +154,30 @@ public final class PlayerExtendedProperties implements IExtendedEntityProperties
      * Сохраненное количество опыта для кузнечного дела
      * Работает только на стороне клиента
      */
-
     public void saveLatestExp(int exp) {
         latestExp = exp;
     }
 
     public int loadLatestExp() {
         return latestExp;
+    }
+
+
+    /*
+     * Иноформация о воре
+     * Работает только на сервере
+     */
+    public void saveThiefInfo(String name, long time) {
+        thiefName = name;
+        thiefTime = time;
+    }
+
+    public String getThiefName() {
+        return thiefName;
+    }
+
+    public long getThiefTime() {
+        return thiefTime;
     }
 
     @Override

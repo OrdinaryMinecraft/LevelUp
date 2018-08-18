@@ -10,6 +10,7 @@ import net.minecraft.block.BlockContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
@@ -22,6 +23,7 @@ import ru.flametaichou.levelup.*;
 import ru.flametaichou.levelup.Model.OreCount;
 import ru.flametaichou.levelup.Model.PlayerClass;
 import ru.flametaichou.levelup.Util.ConfigHelper;
+import ru.flametaichou.levelup.Util.PlayerUtils;
 import ru.flametaichou.levelup.gui.GuiClasses;
 import ru.flametaichou.levelup.gui.GuiSkills;
 import ru.flametaichou.levelup.gui.LevelUpHUD;
@@ -59,9 +61,10 @@ public final class SkillKeyHandler {
                     playerClass != PlayerClass.HUNTER &&
                     playerClass != PlayerClass.PEASANT) {
 
+                boolean skillUsed = false;
                 int skillColldown = 20 * ConfigHelper.activeSkillCooldown;
 
-                if (player.worldObj.getTotalWorldTime() - PlayerExtendedProperties.from(player).loadLastSkillActivation() > skillColldown) {
+                if ((player.worldObj.getTotalWorldTime() - PlayerExtendedProperties.from(player).loadLastSkillActivation() > skillColldown) ||  player.capabilities.isCreativeMode) {
                     // Miner class bonus
                     if (playerClass == PlayerClass.MINER) {
                         int radius = 10;
@@ -129,17 +132,20 @@ public final class SkillKeyHandler {
                             player.addChatComponentMessage(new ChatComponentTranslation("miner.ores.ore"));
                             player.addChatComponentMessage(new ChatComponentTranslation("· X:" + ore_x + " Y:" + ore_y + " Z:" + ore_z + " (" + block_name + ")"));
                         }
+                        skillUsed = true;
                     }
 
                     // Marksman class bonus
                     if (playerClass == PlayerClass.MARKSMAN) {
                         PlayerExtendedProperties.from(player).sendDoubleShotCount(3, player.worldObj.isRemote);
+                        skillUsed = true;
                     }
 
                     // Swordsman class bonus
                     if (playerClass == PlayerClass.SWORDSMAN) {
                         FMLProxyPacket packet = SkillPacketHandler.getOtherPacket(Side.SERVER, "swordsmanBuff");
                         LevelUp.otherChannel.sendToServer(packet);
+                        skillUsed = true;
                     }
 
                     // Thief class bonus
@@ -153,6 +159,7 @@ public final class SkillKeyHandler {
                                     // Steal from player
                                     FMLProxyPacket packet = SkillPacketHandler.getOtherPacket(Side.SERVER, "steal/player/" + victim.getDisplayName());
                                     LevelUp.otherChannel.sendToServer(packet);
+                                    skillUsed = true;
                                 }
                             } else if (objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
                                 TileEntity te = player.worldObj.getTileEntity(objectMouseOver.blockX, objectMouseOver.blockY, objectMouseOver.blockZ);
@@ -163,6 +170,7 @@ public final class SkillKeyHandler {
                                         // Steal from container
                                         FMLProxyPacket packet = SkillPacketHandler.getOtherPacket(Side.SERVER, "steal/block/" + objectMouseOver.blockX + "/" + objectMouseOver.blockY + "/" + objectMouseOver.blockZ);
                                         LevelUp.otherChannel.sendToServer(packet);
+                                        skillUsed = true;
                                     }
                                 }
                             }
@@ -173,15 +181,19 @@ public final class SkillKeyHandler {
                     if (playerClass == PlayerClass.SENTINEL) {
                         FMLProxyPacket packet = SkillPacketHandler.getOtherPacket(Side.SERVER, "sentinelBuff");
                         LevelUp.otherChannel.sendToServer(packet);
+                        skillUsed = true;
                     }
 
                     // Traveller class bonus
                     if (playerClass == PlayerClass.TRAVELLER) {
                         FMLProxyPacket packet = SkillPacketHandler.getOtherPacket(Side.SERVER, "travellerBuff");
                         LevelUp.otherChannel.sendToServer(packet);
+                        skillUsed = true;
                     }
 
-                    PlayerExtendedProperties.from(player).sendLastSkillActivation(player.worldObj.getTotalWorldTime(), player.worldObj.isRemote);
+                    if (skillUsed) {
+                        PlayerExtendedProperties.from(player).sendLastSkillActivation(player.worldObj.getTotalWorldTime(), player.worldObj.isRemote);
+                    }
                 } else {
                     long timeDiff = player.worldObj.getTotalWorldTime() - PlayerExtendedProperties.from(player).loadLastSkillActivation();
                     player.addChatComponentMessage(new ChatComponentTranslation("key.message.cooldown", skillColldown / 20 - timeDiff / 20));

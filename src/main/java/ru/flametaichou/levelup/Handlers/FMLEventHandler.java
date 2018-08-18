@@ -272,24 +272,25 @@ public final class FMLEventHandler {
     public void onSmelting(PlayerEvent.ItemSmeltedEvent event) {
     	LevelUp.takenFromSmelting(event.player, event.smelting);
         PlayerClass playerClass = PlayerExtendedProperties.getPlayerClass(event.player);
-        // Peasant class bonus
-    	// Smith class bonus
     	if (!event.player.worldObj.isRemote) {
-            Random random = event.player.getRNG();
             ItemStack add = null;
             if (event.smelting.getItemUseAction() == EnumAction.eat) {
+
+                // Peasant class bonus
                 if (playerClass == PlayerClass.PEASANT) {
                     if (Math.random() <= 0.15) {
                         add = event.smelting.copy();
                         event.player.addChatComponentMessage(new ChatComponentTranslation("peasant.smelting.double"));
                     }
                 }
-            } else if (playerClass == PlayerClass.SMITH) {
-                if (Math.random() <= 0.15) {
-                    add = event.smelting.copy();
-                    event.player.addChatComponentMessage(new ChatComponentTranslation("smith.smelting.double"));
-                }
             }
+//            // Убрано из-за практически дюпа в Metallurgy когда слитки можно переделывать в пыль и снова переплавлять
+//            else if (playerClass == PlayerClass.SMITH) {
+//                if (Math.random() <= 0.15) {
+//                    add = event.smelting.copy();
+//                    event.player.addChatComponentMessage(new ChatComponentTranslation("smith.smelting.double"));
+//                }
+//            }
             //TODO: добавить обработку shift
             EntityItem entityitem = ForgeHooks.onPlayerTossEvent(event.player, add, true);
             if (entityitem != null) {
@@ -312,6 +313,47 @@ public final class FMLEventHandler {
      */
     @SubscribeEvent
     public void onCrafting(PlayerEvent.ItemCraftedEvent event) {
+
+        PlayerClass playerClass = PlayerExtendedProperties.getPlayerClass(event.player);
+        if (!event.player.worldObj.isRemote) {
+            ItemStack add = null;
+
+            // Smith class bonus
+            if (playerClass == PlayerClass.SMITH) {
+                List<ItemStack> itemStacks = new ArrayList<ItemStack>();
+                boolean containsIngots = false;
+                for (int i = 0; i < event.craftMatrix.getSizeInventory(); i++) {
+                    if (Objects.nonNull(event.craftMatrix.getStackInSlot(i))) {
+                        itemStacks.add(event.craftMatrix.getStackInSlot(i));
+                        if (event.craftMatrix.getStackInSlot(i).getItem().getUnlocalizedName().toLowerCase().contains("ingot")) {
+                            containsIngots = true;
+                        }
+                    }
+                }
+
+                // To prevent uncraft ingot blocks like iron block, gold block, etc. dupe
+                if (event.crafting.getItem().getUnlocalizedName().toLowerCase().contains("block")) {
+                    containsIngots = false;
+                }
+
+                if (event.crafting.getItem() instanceof ItemTool || event.crafting.getItem() instanceof ItemArmor || containsIngots) {
+                    if (Math.random() <= 0.30) {
+                        int slot = random.nextInt(itemStacks.size()) + 1;
+                        add = itemStacks.get(slot);
+                        event.player.addChatComponentMessage(new ChatComponentTranslation("smith.crafting.return"));
+                    }
+                }
+            }
+
+            if (Objects.nonNull(add)) {
+                EntityItem entityitem = ForgeHooks.onPlayerTossEvent(event.player, add, true);
+                if (entityitem != null) {
+                    entityitem.delayBeforeCanPickup = 0;
+                    entityitem.func_145797_a(event.player.getCommandSenderName());
+                }
+            }
+        }
+
 //        if(e.crafting.getItem().equals(Tools.RubyAxe)){
 //            e.player.addStat(Achievements.achievementRubyAxe, 1);
 //        }

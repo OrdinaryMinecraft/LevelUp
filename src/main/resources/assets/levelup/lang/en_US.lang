@@ -1,4 +1,5 @@
-﻿
+﻿itemGroup.levelup=Level Up! Ordinary Edition
+
 item.respecBook.name=Book of Unlearning
 item.xpTalisman.name=Talisman of Wonder
 item.fishingLootBox.name=Treasure Chest
@@ -91,6 +92,7 @@ config.levelup.option0=Allow HUD : %b
 config.levelup.option1=Render HUD on Top Left : %b
 config.levelup.option2=Render HUD on Exp Bar : %b
 config.levelup.option3=FOV is based on speed : %b
+death.attack.justice=Thief %s was punished by justice!
 
 sneak.attack=Sneak attack for %d x damage!
 critical.attack=Critical attack for %d x damage!

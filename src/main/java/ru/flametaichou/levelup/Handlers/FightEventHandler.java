@@ -1,6 +1,7 @@
 package ru.flametaichou.levelup.Handlers;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -50,6 +51,26 @@ public final class FightEventHandler {
                 EntityPlayer player = (EntityPlayer) event.entityLiving;
                 if (PlayerExtendedProperties.getPlayerClass(player) == PlayerClass.TRAVELLER) {
                     player.addPotionEffect(new PotionEffect(23, 6, 0, true));
+                }
+            }
+        }
+
+        // Thief kill
+        if (damagesource.getEntity() instanceof EntityPlayer) {
+            EntityPlayer player = (EntityPlayer) damagesource.getEntity();
+    	    if (Objects.nonNull(PlayerExtendedProperties.from(player).getThiefName()) &&
+                    player.worldObj.getWorldTime() - PlayerExtendedProperties.from(player).getThiefTime() <= ConfigHelper.thiefKillTime) {
+    	        if (event.entity instanceof EntityPlayer) {
+                    EntityPlayer thief = (EntityPlayer) event.entity;
+                    if (thief.getDisplayName().equals(PlayerExtendedProperties.from(player).getThiefName())) {
+                        player.addChatComponentMessage(new ChatComponentTranslation("stealing.player.thiefkilled"));
+
+                        DamageSource justice = new DamageSource("justice");
+                        justice.setMagicDamage();
+                        thief.attackEntityFrom(justice, 9999);
+
+                        PlayerExtendedProperties.from(player).saveThiefInfo(thief.getDisplayName(), 0);
+                    }
                 }
             }
         }

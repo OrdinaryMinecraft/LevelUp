@@ -17,7 +17,6 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ChatComponentTranslation;
-import net.minecraftforge.event.world.NoteBlockEvent;
 import ru.flametaichou.levelup.*;
 import ru.flametaichou.levelup.Model.ExtPropPacket;
 import ru.flametaichou.levelup.Model.PacketChannel;
@@ -134,9 +133,14 @@ public final class SkillPacketHandler {
                 int slot = random.nextInt(slotsArray.size());
                 ItemStack stealingItem = victim.inventory.mainInventory[slotsArray.get(slot)];
                 if (Math.random() <= stealChanse) {
+                    int count = 1;
+                    if (stealingItem.stackSize > 1) {
+                        count = random.nextInt(stealingItem.stackSize / 2) + 1;
+                    }
                     ItemStack stealingItemCopy = stealingItem.copy();
-                    stealingItemCopy.stackSize = 1;
-                    victim.inventory.consumeInventoryItem(stealingItem.getItem());
+                    stealingItemCopy.stackSize = count;
+                    //victim.inventory.consumeInventoryItem(stealingItem.getItem());
+                    victim.inventory.decrStackSize(slotsArray.get(slot), count);
                     entityPlayerMP.inventory.addItemStackToInventory(stealingItemCopy);
                     entityPlayerMP.addChatComponentMessage(new ChatComponentTranslation("stealing.player.success", stealingItem.getItem().getItemStackDisplayName(stealingItem)));
                     entityPlayerMP.worldObj.playSoundEffect(entityPlayerMP.posX, entityPlayerMP.posY, entityPlayerMP.posZ, "mob.irongolem.throw", 1.5F, 1.5F);
@@ -144,6 +148,7 @@ public final class SkillPacketHandler {
                     entityPlayerMP.addChatComponentMessage(new ChatComponentTranslation("stealing.player.fail"));
                     victim.addChatComponentMessage(new ChatComponentTranslation("stealing.player.victim", entityPlayerMP.getDisplayName()));
                     entityPlayerMP.worldObj.playSoundEffect(entityPlayerMP.posX, entityPlayerMP.posY, entityPlayerMP.posZ, "mob.chicken.hurt", 1.2F, 1.2F);
+                    PlayerExtendedProperties.from(victim).saveThiefInfo(entityPlayerMP.getDisplayName(), entityPlayerMP.worldObj.getWorldTime());
                 }
             } else if (parts[1].equals("block")) {
                 // Steam from block
@@ -172,8 +177,12 @@ public final class SkillPacketHandler {
                     // 20%
                     if (Math.random() <= basicStealChanse) {
                         ItemStack stealingItemCopy = stealingItem.copy();
-                        stealingItemCopy.stackSize = 1;
-                        container.decrStackSize(slot, 1);
+                        int count = 1;
+                        if (stealingItem.stackSize > 1) {
+                            count = random.nextInt(stealingItem.stackSize / 2) + 1;
+                        }
+                        stealingItemCopy.stackSize = count;
+                        container.decrStackSize(slotsArray.get(slot), count);
                         entityPlayerMP.inventory.addItemStackToInventory(stealingItemCopy);
                         entityPlayerMP.addChatComponentMessage(new ChatComponentTranslation("stealing.block.success", stealingItem.getItem().getItemStackDisplayName(stealingItem)));
                         entityPlayerMP.worldObj.playSoundEffect(entityPlayerMP.posX, entityPlayerMP.posY, entityPlayerMP.posZ, "mob.irongolem.throw", 1.5F, 1.5F);

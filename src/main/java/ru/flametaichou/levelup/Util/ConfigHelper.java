@@ -29,6 +29,8 @@ public class ConfigHelper {
     public static int percentSkillOnDeath;
     public static int activeSkillCooldown;
 
+    public static long thiefKillTime = 200;
+
 
     private static void setupConfig(Configuration config) {
         try {

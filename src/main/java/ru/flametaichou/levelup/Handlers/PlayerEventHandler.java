@@ -26,6 +26,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.FishingHooks;
 import net.minecraftforge.common.IExtendedEntityProperties;
+import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.*;
@@ -59,6 +60,8 @@ public final class PlayerEventHandler {
     private static ItemStack digLoot1[] = {new ItemStack(Items.gunpowder)};
     private static ItemStack digLoot2[] = {new ItemStack(Items.slime_ball), new ItemStack(Items.redstone)};
     private static ItemStack digLoot3[] = {new ItemStack(Items.glowstone_dust),new ItemStack(Items.gold_nugget)};
+
+    private Random random = new Random();
     /**
      * Internal ores list for Mining
      */
@@ -308,8 +311,21 @@ public final class PlayerEventHandler {
     }
 
     @SubscribeEvent
-    public void onAnvilRepair(AnvilRepairEvent event) {
+    public void onAnvilRepair(AnvilUpdateEvent event) {
+        if (Objects.nonNull(event.left.getTagCompound())) {
+            if (Objects.nonNull(event.left.getTagCompound().getString("RepairCost"))) {
+                event.left.getTagCompound().removeTag("RepairCost");
+            }
+        }
+        if (Objects.nonNull(event.right.getTagCompound())) {
+            if (Objects.nonNull(event.right.getTagCompound().getString("RepairCost"))) {
+                event.right.getTagCompound().removeTag("RepairCost");
+            }
+        }
+    }
 
+    @SubscribeEvent
+    public void onAnvilRepair(AnvilRepairEvent event) {
         PlayerClass playerClass = PlayerExtendedProperties.getPlayerClass(event.entityPlayer);
         if (!event.entityPlayer.worldObj.isRemote) {
             // Blacksmithing skill
@@ -344,13 +360,14 @@ public final class PlayerEventHandler {
             }
         } else {
             if (getSkill(event.entityPlayer, PlayerSkill.BLACKSMITHING) >= 5) {
-                // Returning exp from repair
-                if (Math.random() < 0.25) {
-                    int lvlDiff = PlayerExtendedProperties.from(event.entityPlayer).loadLatestExp() - event.entityPlayer.experienceLevel;
-                    int multiplier = getSkill(event.entityPlayer, PlayerSkill.BLACKSMITHING) / 5 * 5;
-                    int returnedExp = lvlDiff / 100 * multiplier;
-                    if (lvlDiff >= 6 && returnedExp < 1)
-                        returnedExp = 1;
+//                // Returning exp from repair
+//                if (Math.random() < 0.25) {
+//                }
+                int lvlDiff = PlayerExtendedProperties.from(event.entityPlayer).loadLatestExp() - event.entityPlayer.experienceLevel;
+                int multiplier = getSkill(event.entityPlayer, PlayerSkill.BLACKSMITHING) / 5 * 10;
+                int maxReturnedExp = (int) ((double) lvlDiff / (double) 100 * (double) multiplier);
+                if (lvlDiff > 1) {
+                    int returnedExp = random.nextInt(maxReturnedExp + 1) + 1;
                     FMLProxyPacket packet = SkillPacketHandler.getOtherPacket(Side.SERVER, "addExp/" + returnedExp);
                     LevelUp.otherChannel.sendToServer(packet);
                     event.entityPlayer.addChatComponentMessage(new ChatComponentTranslation("blacksmith.xp.return", returnedExp));
