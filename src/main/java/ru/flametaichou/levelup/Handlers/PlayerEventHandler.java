@@ -311,20 +311,6 @@ public final class PlayerEventHandler {
     }
 
     @SubscribeEvent
-    public void onAnvilRepair(AnvilUpdateEvent event) {
-        if (Objects.nonNull(event.left.getTagCompound())) {
-            if (Objects.nonNull(event.left.getTagCompound().getString("RepairCost"))) {
-                event.left.getTagCompound().removeTag("RepairCost");
-            }
-        }
-        if (Objects.nonNull(event.right.getTagCompound())) {
-            if (Objects.nonNull(event.right.getTagCompound().getString("RepairCost"))) {
-                event.right.getTagCompound().removeTag("RepairCost");
-            }
-        }
-    }
-
-    @SubscribeEvent
     public void onAnvilRepair(AnvilRepairEvent event) {
         PlayerClass playerClass = PlayerExtendedProperties.getPlayerClass(event.entityPlayer);
         if (!event.entityPlayer.worldObj.isRemote) {

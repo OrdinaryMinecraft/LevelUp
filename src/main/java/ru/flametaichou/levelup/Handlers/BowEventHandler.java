@@ -44,7 +44,7 @@ public final class BowEventHandler {
                     if (PlayerExtendedProperties.from(archer).loadDoubleShotCount() > 0) {
 
                         // If this is Arrow (not a bolt or a bullet)
-                        if (event.entity.getClass().getName().equals(EntityArrow.class.getName())) {
+                        if (event.entity.getClass().getName().equals(EntityArrow.class.getName()) || event.entity.getClass().getName().equals("imc.entities.EntityIMCArrow")) {
 
                             int countArrows = 0;
                             ItemStack arrowStack = null;
