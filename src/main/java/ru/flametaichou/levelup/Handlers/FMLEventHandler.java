@@ -338,7 +338,8 @@ public final class FMLEventHandler {
 
                 if (event.crafting.getItem() instanceof ItemTool || event.crafting.getItem() instanceof ItemArmor || containsIngots) {
                     if (Math.random() <= 0.30) {
-                        int slot = random.nextInt(itemStacks.size()) + 1;
+                        //int slot = random.nextInt(itemStacks.size()) + 1;
+                        int slot = WorldUtils.randomBetween(0, itemStacks.size() - 1);
                         add = itemStacks.get(slot);
                         event.player.addChatComponentMessage(new ChatComponentTranslation("smith.crafting.return"));
                     }

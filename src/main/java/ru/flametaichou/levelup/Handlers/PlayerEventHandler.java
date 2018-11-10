@@ -9,6 +9,8 @@ import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.monster.EntityMob;
@@ -187,9 +189,15 @@ public final class PlayerEventHandler {
                     ItemStack item = event.entityPlayer.getHeldItem();
                     int damage = item.getItemDamage();
                     //item.damageItem(1, event.entityPlayer);
-                    if (!event.entityPlayer.capabilities.isCreativeMode) {
-                        if (item.isItemStackDamageable())
-                            item.setItemDamage(damage+1);
+                    if (!event.entityPlayer.capabilities.isCreativeMode && item.isItemStackDamageable()) {
+                        if (EnchantmentHelper.getEnchantmentLevel(Enchantment.unbreaking.effectId, item) > 0) {
+                            int durabilityLvl = EnchantmentHelper.getEnchantmentLevel(Enchantment.unbreaking.effectId, item);
+                            if (Math.random() >= 0.25 * durabilityLvl) {
+                                item.setItemDamage(damage + 1);
+                            }
+                        } else {
+                            item.setItemDamage(damage + 1);
+                        }
                     }
 //                    if (stack.stackSize <= 0) {
 //                        event.entityPlayer.inventory.setInventorySlotContents(event.entityPlayer.inventory.currentItem, null);
