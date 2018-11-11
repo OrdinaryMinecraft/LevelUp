@@ -24,8 +24,7 @@ public class MobEventHandler {
     public static final MobEventHandler INSTANCE = new MobEventHandler();
 
 	@SubscribeEvent
-    public void onMobDrops(LivingDropsEvent event)
-    {
+    public void onMobDrops(LivingDropsEvent event) {
 		// Фикс дублирования дропа с мобов из-за костыльного нанесения урона @FightEventHandler.onHurting
 		if (event.entityLiving.getHealth() == -1) {
 			event.entityLiving.setHealth(0);

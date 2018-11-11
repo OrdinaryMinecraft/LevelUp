@@ -431,7 +431,7 @@ public final class PlayerEventHandler {
                 if(!((IGrowable)event.block).func_149851_a(event.world, event.x, event.y, event.z, false)) {//Fully grown
                     doCropDrops(event);
                 }
-            }else if(event.block instanceof BlockMelon){
+            } else if(event.block instanceof BlockMelon){
                 doCropDrops(event);
             }
         }

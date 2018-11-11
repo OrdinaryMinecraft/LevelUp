@@ -2,11 +2,14 @@ package ru.flametaichou.levelup.Handlers;
 
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerUseItemEvent;
 import ru.flametaichou.levelup.Entity.EntityCustomArrow;
@@ -14,7 +17,9 @@ import ru.flametaichou.levelup.Model.PlayerClass;
 import ru.flametaichou.levelup.Model.PlayerSkill;
 import ru.flametaichou.levelup.PlayerExtendedProperties;
 
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 public final class BowEventHandler {
     public static final BowEventHandler INSTANCE = new BowEventHandler();
@@ -24,6 +29,10 @@ public final class BowEventHandler {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onSpawn(EntityJoinWorldEvent event) {
+        if (event.world.isRemote) {
+            return;
+        }
+
         if (event.entity instanceof EntityArrow) {
             EntityArrow arrow = (EntityArrow) event.entity;
             if (arrow.shootingEntity instanceof EntityPlayer) {
