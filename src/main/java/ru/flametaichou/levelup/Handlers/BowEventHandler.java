@@ -27,7 +27,7 @@ public final class BowEventHandler {
     private BowEventHandler() {
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onSpawn(EntityJoinWorldEvent event) {
         if (event.world.isRemote) {
             return;
