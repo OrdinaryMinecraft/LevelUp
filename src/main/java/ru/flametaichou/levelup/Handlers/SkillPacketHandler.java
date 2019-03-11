@@ -221,10 +221,13 @@ public final class SkillPacketHandler {
 
     @SubscribeEvent
     public void onClientPacket(FMLNetworkEvent.ClientCustomPacketEvent event) {
-        if (event.packet.channel().equals(PacketChannel.LEVELUPINIT.name()))
+        if (event.packet.channel().equals(PacketChannel.LEVELUPINIT.name())) {
             handlePacket(event.packet, LevelUp.proxy.getPlayer());
-        else if (event.packet.channel().equals(PacketChannel.LEVELUPCFG.name()))
+        } else if (event.packet.channel().equals(PacketChannel.LEVELUPCFG.name())) {
             handleConfig(event.packet);
+        } else if (event.packet.channel().equals(PacketChannel.LEVELUPEXTPROP.name())) {
+            handleExtPropsChange(event.packet, LevelUp.proxy.getPlayer());
+        }
     }
 
     private void handlePacket(FMLProxyPacket packet, EntityPlayer player) {
